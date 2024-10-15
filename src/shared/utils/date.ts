@@ -19,11 +19,11 @@ export function isMondayOrThursday() {
 // Функция для загрузки даты последнего опроса из файла
 export function loadLastPollDate() {
   if (fs.existsSync(pollDateFile)) {
-      const data = fs.readFileSync(pollDateFile, 'utf8');
-      return JSON.parse(data).lastPollDate || null;
+    const data = fs.readFileSync(pollDateFile, 'utf8');
+    return JSON.parse(data).lastPollDate || null;
   }
   return null;
-} 
+}
 
 // Функция для сохранения даты последнего опроса в файл
 export function saveLastPollDate(date: string) {

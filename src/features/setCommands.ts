@@ -1,4 +1,4 @@
-import TelegramBot from "node-telegram-bot-api";
+import TelegramBot from 'node-telegram-bot-api';
 
 export const setCommands = (bot: TelegramBot) => {
   // Устанавливаем команды для бота

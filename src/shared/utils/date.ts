@@ -1,7 +1,7 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import { ROUTES } from '../routes/routes';
 
-const pollDateFile = path.join(__dirname, 'shared/utils/pollDate.json');
+const pollDateFile = ROUTES.POLL_DATE;
 
 // Функция для получения сегодняшней даты в формате YYYY-MM-DD
 export function getTodayDate() {

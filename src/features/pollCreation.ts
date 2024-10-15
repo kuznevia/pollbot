@@ -1,11 +1,11 @@
 import TelegramBot from 'node-telegram-bot-api';
-import path from 'path';
 import {
   getTodayDate,
   isMondayOrThursday,
   saveLastPollDate,
 } from '../shared/utils/date';
 import { state } from '../shared/state/state';
+import { ROUTES } from '../shared/routes/routes';
 
 // Регулярный опрос на тренировку
 const schedulePoll = (bot: TelegramBot, chatId: TelegramBot.ChatId) => {
@@ -22,20 +22,23 @@ export const startPollListener = (bot: TelegramBot) => {
   bot.onText(/\/poll/, (msg) => {
     const chatId = msg.chat.id;
     // Путь к локальному GIF файлу
-    const gifPath = path.join(__dirname, 'assets', 'hello_chat.mp4');
+    const gifPath = ROUTES.HELLO_JPG;
 
     const today = getTodayDate();
 
     const { lastPollDate, isPolling } = state;
 
-    // // Проверяем, является ли сегодня понедельником или четвергом
-    // if (!isMondayOrThursday()) {
-    //   bot.sendMessage(chatId, `${msg.from?.first_name}, опросы можно создавать только по понедельникам и четвергам, мразь`);
+    // Проверяем, является ли сегодня понедельником или четвергом
+    if (!isMondayOrThursday()) {
+      bot.sendMessage(
+        chatId,
+        `${msg.from?.first_name}, опросы можно создавать только по понедельникам и четвергам, мразь`
+      );
 
-    //   return;
-    // }
+      return;
+    }
 
-    // Проверка, был ли уже создан опрос сегодня
+    // Проверка, был ли уже создан опрос сsегодня
     if (lastPollDate === today) {
       bot.sendMessage(
         chatId,
@@ -70,11 +73,7 @@ export const startPollListener = (bot: TelegramBot) => {
       .catch((err) => {
         console.error('Ошибка: ', err);
         const errorMessage = err?.response?.body?.description;
-        bot.sendMessage(
-          chatId,
-          `Ошибка, братья, 
-${errorMessage}`
-        );
+        bot.sendMessage(chatId, `Ошибка, братья, \n${errorMessage}`);
       })
       .finally(() => {
         // Обновляем и сохраняем дату последнего опроса

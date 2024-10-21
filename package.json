@@ -3,7 +3,7 @@
   "version": "1.1.0",
   "main": "pollbot.js",
   "scripts": {
-    "start": "node ./dist/index.js",
+    "start": "node ./dist/pollbot.js",
     "dev": "nodemon",
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",

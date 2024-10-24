@@ -16,7 +16,7 @@ export function isMondayOrThursday() {
   return dayOfWeek === 1 || dayOfWeek === 4; // Возвращаем true, если понедельник или четверг
 }
 
-// Функция для загрузки даты последнего опроса из файла
+// Функция для загрузки даты последнего опроса из фйла
 export function loadLastPollDate() {
   if (fs.existsSync(pollDateFile)) {
     const data = fs.readFileSync(pollDateFile, 'utf8');

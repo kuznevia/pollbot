@@ -10,7 +10,7 @@ import { ROUTES } from '../shared/routes/routes';
 // Регулярный опрос на тренировку
 const schedulePoll = (bot: TelegramBot, chatId: TelegramBot.ChatId) => {
   const pollQuestion = 'Тренировка в 22:00';
-  const options = ['Да', 'Нет', 'Не знаю', 'Ярослав Исаков'];
+  const options = ['Да', 'Нет', 'Не знаю'];
 
   return bot.sendPoll(chatId, pollQuestion, options, {
     is_anonymous: false,

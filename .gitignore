@@ -1,2 +1,4 @@
 node_modules
 pollDate.json
+dist
+.env

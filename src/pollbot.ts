@@ -2,10 +2,16 @@ import TelegramBot from 'node-telegram-bot-api';
 import { setCommands } from './features/setCommands';
 import { startPollListener } from './features/pollCreation';
 
-const token = '7871528931:AAEia8GBL_8Eb9qVnrCQ-hi2qPjR4FTdQW0';
+require('dotenv').config();
 
-const bot = new TelegramBot(token, { polling: true });
+const token = process.env.BOT_TOKEN;
 
-setCommands(bot);
+if (token) {
+  const bot = new TelegramBot(token, { polling: true });
 
-startPollListener(bot);
+  setCommands(bot);
+
+  startPollListener(bot);
+} else {
+  console.error('token is undefined');
+}

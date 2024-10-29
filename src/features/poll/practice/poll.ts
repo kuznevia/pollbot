@@ -47,7 +47,10 @@ export const sendPoll = (bot: TelegramBot, chatId: number, sender?: string) => {
   }
 
   if (isPolling) {
-    bot.sendMessage(chatId, `${name}, опоздал, мразь, уже создаю другой опрос`);
+    bot.sendMessage(
+      chatId,
+      `${sender}, опоздал, мразь, уже создаю другой опрос`
+    );
 
     return;
   }
@@ -63,7 +66,8 @@ export const sendPoll = (bot: TelegramBot, chatId: number, sender?: string) => {
       return bot.pinChatMessage(chatId, messageId);
     })
     .then(() => {
-      return bot.sendMessage(chatId, 'Гойда, братья');
+      const message = sender ? 'Гойда, братья' : 'Опередил вас, дрочилы';
+      return bot.sendMessage(chatId, message);
     })
     .catch((err) => {
       console.error('Ошибка: ', err);

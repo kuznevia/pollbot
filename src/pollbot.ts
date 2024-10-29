@@ -5,6 +5,7 @@ import {
   schedulePracticePoll,
 } from './features/poll/practice';
 import { activateMessageReactions } from './features/messageReactions';
+import { scheduleGamePoll } from './features/poll/games';
 
 require('dotenv').config({
   path: `.env.${process.env.NODE_ENV}`, // Загружает соответствующий файл .env
@@ -22,6 +23,8 @@ if (token) {
   schedulePracticePoll(bot);
 
   activateMessageReactions(bot);
+
+  scheduleGamePoll(bot);
 
   bot.on('polling_error', (error) => {
     console.error('Ошибка polling:', error);

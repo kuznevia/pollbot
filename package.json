@@ -1,6 +1,6 @@
 {
   "name": "pollbot",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "main": "pollbot.js",
   "scripts": {
     "start": "cross-env NODE_ENV=production node ./dist/pollbot.js",
@@ -15,6 +15,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "axios": "^1.7.7",
     "dotenv": "^16.4.5",
     "node-cron": "^3.0.3",
     "node-telegram-bot-api": "^0.66.0"

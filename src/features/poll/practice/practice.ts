@@ -1,12 +1,7 @@
 import TelegramBot from 'node-telegram-bot-api';
 import cron from 'node-cron';
 import { sendPoll } from './poll';
-
-require('dotenv').config({
-  path: `.env.${process.env.NODE_ENV}`, // Загружает соответствующий файл .env
-});
-
-const chatId = process.env.CHAT_ID;
+import { chatId } from '../../../shared/consts/consts';
 
 export const startPracticePollListener = (bot: TelegramBot) => {
   // Команда для запуска опроса
@@ -15,10 +10,12 @@ export const startPracticePollListener = (bot: TelegramBot) => {
   });
 };
 
+const sendPracticePoll = (bot: TelegramBot) => {
+  sendPoll(bot, Number(chatId));
+  console.log('Автоматически отправлен опрос');
+};
+
 export const schedulePracticePoll = (bot: TelegramBot) => {
   // Периодическое создание опроса по расписанию
-  cron.schedule('30 10 * * 1,4,6', () => {
-    sendPoll(bot, Number(chatId));
-    console.log('Автоматически отправлен опрос');
-  });
+  cron.schedule('30 10 * * 1,4,6', () => sendPracticePoll(bot));
 };

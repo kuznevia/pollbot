@@ -4,6 +4,7 @@ import {
   startPracticePollListener,
   schedulePracticePoll,
 } from './features/poll/practice';
+import { activateMessageReactions } from './features/messageReactions';
 
 require('dotenv').config();
 
@@ -17,6 +18,8 @@ if (token) {
   startPracticePollListener(bot);
 
   schedulePracticePoll(bot);
+
+  activateMessageReactions(bot);
 
   bot.on('polling_error', (error) => {
     console.error('Ошибка polling:', error);

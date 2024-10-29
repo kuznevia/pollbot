@@ -6,9 +6,11 @@ import {
 } from './features/poll/practice';
 import { activateMessageReactions } from './features/messageReactions';
 
-require('dotenv').config();
+require('dotenv').config({
+  path: `.env.${process.env.NODE_ENV}`, // Загружает соответствующий файл .env
+});
 
-const token = process.env.BOT_DEV_TOKEN;
+const token = process.env.BOT_TOKEN;
 
 if (token) {
   const bot = new TelegramBot(token, { polling: true });

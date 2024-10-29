@@ -5,8 +5,8 @@ export const setCommands = (bot: TelegramBot) => {
   bot.setMyCommands([
     { command: '/poll', description: 'Запустить опрос на тренировку' },
   ]);
-
-  bot.on('polling_error', (error) => {
-    console.error('Ошибка polling:', error);
+  bot.onText(/\/chat_id/, (msg) => {
+    const chatId = msg.chat.id;
+    bot.sendMessage(chatId, `Ваш chatId: ${chatId}`);
   });
 };

@@ -1,6 +1,9 @@
 import TelegramBot from 'node-telegram-bot-api';
 import { setCommands } from './features/setCommands';
-import { startPollListener } from './features/pollCreation';
+import {
+  startPracticePollListener,
+  schedulePracticePoll,
+} from './features/poll/practice';
 
 require('dotenv').config();
 
@@ -11,7 +14,13 @@ if (token) {
 
   setCommands(bot);
 
-  startPollListener(bot);
+  startPracticePollListener(bot);
+
+  schedulePracticePoll(bot);
+
+  bot.on('polling_error', (error) => {
+    console.error('Ошибка polling:', error);
+  });
 } else {
   console.error('token is undefined');
 }

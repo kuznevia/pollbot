@@ -1,6 +1,6 @@
 {
   "name": "pollbot",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "main": "pollbot.js",
   "scripts": {
     "start": "node ./dist/pollbot.js",
@@ -16,10 +16,12 @@
   "description": "",
   "dependencies": {
     "dotenv": "^16.4.5",
+    "node-cron": "^3.0.3",
     "node-telegram-bot-api": "^0.66.0"
   },
   "devDependencies": {
     "@types/node": "^22.7.5",
+    "@types/node-cron": "^3.0.11",
     "@types/node-telegram-bot-api": "^0.64.7",
     "@typescript-eslint/eslint-plugin": "^8.9.0",
     "@typescript-eslint/parser": "^8.9.0",

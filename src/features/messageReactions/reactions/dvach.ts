@@ -17,11 +17,6 @@ export const activateDvachReaction = (bot: TelegramBot) => {
           bot.sendMessage(chatId, 'БАЯЯЯЯЯЯЯЯЯЯЯЯН', {
             reply_to_message_id: msg.message_id,
           });
-        })
-        .then(() => {
-          bot.sendMessage(chatId, 'Как же заебал твой ДВАЧ', {
-            reply_to_message_id: msg.message_id,
-          });
         });
     }
   });

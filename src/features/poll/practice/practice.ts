@@ -2,7 +2,9 @@ import TelegramBot from 'node-telegram-bot-api';
 import cron from 'node-cron';
 import { sendPoll } from './poll';
 
-require('dotenv').config();
+require('dotenv').config({
+  path: `.env.${process.env.NODE_ENV}`, // Загружает соответствующий файл .env
+});
 
 const chatId = process.env.CHAT_ID;
 

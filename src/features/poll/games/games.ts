@@ -47,6 +47,6 @@ const sendGamePoll = async (bot: TelegramBot) => {
 
 export const scheduleGamePoll = (bot: TelegramBot) => {
   // Периодическая проверка расписания
-  // Каждое утро в 11:00
-  cron.schedule('0 11 * * *', () => sendGamePoll(bot));
+  // Каждое утро в 11:00 мск
+  cron.schedule('0 8 * * *', () => sendGamePoll(bot));
 };

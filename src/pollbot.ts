@@ -1,19 +1,14 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import TelegramBot from 'node-telegram-bot-api';
-import { setCommands } from './features/setCommands';
-import {
-  startPracticePollListener,
-  schedulePracticePoll,
-} from './features/poll/practice';
-import { activateMessageReactions } from './features/messageReactions';
-import { scheduleGamePoll } from './features/poll/games';
+import { initBot } from './initbot';
 
 require('dotenv').config({
   path: `.env.${process.env.NODE_ENV}`,
 });
 
 const token = process.env.BOT_TOKEN;
+const serverUrl = process.env.SERVER_URL;
 const app = express();
 
 if (token) {
@@ -30,24 +25,17 @@ if (token) {
 
   // Установка вебхука
   const setWebhook = async () => {
-    const webhookUrl = `https://pollbot-4r78.onrender.com/webhook/${token}`;
+    const webhookUrl = `${serverUrl}webhook/${token}`;
     await bot.setWebHook(webhookUrl); // Установка вебхука
-  };
-
-  // Инициализация команд и функционала бота
-  const initBot = () => {
-    setCommands(bot);
-    startPracticePollListener(bot);
-    schedulePracticePoll(bot);
-    activateMessageReactions(bot);
-    scheduleGamePoll(bot);
   };
 
   // Запуск сервера
   const PORT = process.env.PORT || 10000;
   app.listen(PORT, async () => {
     await setWebhook(); // Установка вебхука перед запуском
-    initBot(); // Инициализация бота после установки вебхука
+    initBot(bot); // Инициализация бота после установки вебхука
     console.log(`Сервер запущен на порту ${PORT}`);
   });
+} else {
+  console.error('token is undefined');
 }

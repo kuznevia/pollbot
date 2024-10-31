@@ -6,6 +6,7 @@ import {
   schedulePracticePoll,
 } from './features/poll/practice';
 import { setCommands } from './features/setCommands';
+import { startHealthCheckListener } from './features/healthcheck';
 
 // Инициализация команд и функционала бота
 export const initBot = (bot: TelegramBot) => {
@@ -14,4 +15,5 @@ export const initBot = (bot: TelegramBot) => {
   schedulePracticePoll(bot);
   activateMessageReactions(bot);
   scheduleGamePoll(bot);
+  startHealthCheckListener(bot);
 };

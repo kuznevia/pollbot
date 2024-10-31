@@ -36,4 +36,6 @@ if (token) {
     initBot(bot); // Инициализация бота после установки вебхука
     console.log(`Сервер запущен на порту ${PORT}`);
   });
+} else {
+  console.error('token is undefined');
 }

@@ -2,10 +2,12 @@ import TelegramBot from 'node-telegram-bot-api';
 import { ROUTES } from '../../../shared/routes/routes';
 import { state } from '../../../shared/state/state';
 import {
-  getTodayDate,
   isMondayOrThursday,
-  saveLastPollDate,
+  isPollCreatedToday,
+  saveLastPollDateToDB,
 } from '../../../shared/utils/date';
+import { connectDB } from '../../../db/db';
+import { Poll } from '../model';
 
 // Регулярный опрос на тренировку
 const createPoll = (bot: TelegramBot, chatId: TelegramBot.ChatId) => {
@@ -17,13 +19,15 @@ const createPoll = (bot: TelegramBot, chatId: TelegramBot.ChatId) => {
   });
 };
 
-export const sendPoll = (bot: TelegramBot, chatId: number, sender?: string) => {
+export const sendPoll = async (
+  bot: TelegramBot,
+  chatId: number,
+  sender?: string
+) => {
   // Путь к локальному GIF файлу
   const gifPath = ROUTES.HELLO_JPG;
 
-  const today = getTodayDate();
-
-  const { lastPollDate, isPolling } = state;
+  const { isPolling } = state;
 
   // Проверяем, является ли сегодня понедельником или четвергом
   if (!isMondayOrThursday()) {
@@ -35,8 +39,14 @@ export const sendPoll = (bot: TelegramBot, chatId: number, sender?: string) => {
     return;
   }
 
-  // Проверка, был ли уже создан опрос сsегодня
-  if (lastPollDate === today) {
+  // Проверка, был ли уже создан опрос сегодня
+  const db = await connectDB();
+  const pollsCollection = db.collection('polls');
+  const isCreatedToday = await isPollCreatedToday(
+    pollsCollection,
+    Poll.practice
+  );
+  if (isCreatedToday) {
     const message = sender
       ? `${sender}, на сегодня уже есть опрос, мразь`
       : 'Не могу отправить регулярный опрос, какая-то мразь сделала это раньше меня';
@@ -76,8 +86,7 @@ export const sendPoll = (bot: TelegramBot, chatId: number, sender?: string) => {
     })
     .finally(() => {
       // Обновляем и сохраняем дату последнего опроса
-      state.lastPollDate = today;
-      saveLastPollDate(today);
+      saveLastPollDateToDB(pollsCollection, Poll.practice);
       state.isPolling = false;
     });
 };

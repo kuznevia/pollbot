@@ -1,7 +1,5 @@
-import fs from 'fs';
-import { ROUTES } from '../routes/routes';
-
-const pollDateFile = ROUTES.POLL_DATE;
+import { Collection } from 'mongodb';
+import { Poll } from '../../features/poll/model';
 
 // Функция для получения сегодняшней даты в формате YYYY-MM-DD
 export function getTodayDate() {
@@ -27,17 +25,30 @@ export function isMondayOrThursday() {
   return dayOfWeek === 1 || dayOfWeek === 4 || dayOfWeek === 6; // Возвращаем true, если понедельник или четверг
 }
 
-// Функция для загрузки даты последнего опроса из фйла
-export function loadLastPollDate() {
-  if (fs.existsSync(pollDateFile)) {
-    const data = fs.readFileSync(pollDateFile, 'utf8');
-    return JSON.parse(data).lastPollDate || null;
-  }
-  return null;
+// Функция для сохранения даты последнего опроса в файл
+export async function saveLastPollDateToDB(
+  collection: Collection,
+  pollType: Poll
+) {
+  const pollRecord = {
+    type: pollType,
+    date: new Date(),
+  };
+  await collection.insertOne(pollRecord);
+  console.log('Опрос создан и записан в базу данных.');
 }
 
-// Функция для сохранения даты последнего опроса в файл
-export function saveLastPollDate(date: string) {
-  const data = { lastPollDate: date };
-  fs.writeFileSync(pollDateFile, JSON.stringify(data), 'utf8');
+export async function isPollCreatedToday(
+  collection: Collection,
+  pollType: Poll
+) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // Установить время в 00:00
+
+  const poll = await collection.findOne({
+    type: pollType,
+    date: { $gte: today },
+  });
+
+  return !!poll; // Возвращает true, если опрос найден
 }

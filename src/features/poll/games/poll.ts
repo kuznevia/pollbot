@@ -26,7 +26,12 @@ export const createGamePoll = (
   });
 };
 
-export const sendPoll = (bot: TelegramBot, chatId: number, game: Game) => {
+export const sendPoll = (
+  bot: TelegramBot,
+  chatId: number,
+  game: Game,
+  isLastPoll: boolean
+) => {
   return createGamePoll(bot, Number(chatId), game)
     .then((pollMessage) => {
       //Добавляем сообщение закреп
@@ -34,7 +39,9 @@ export const sendPoll = (bot: TelegramBot, chatId: number, game: Game) => {
       return bot.pinChatMessage(chatId, messageId);
     })
     .then(() => {
-      return bot.sendMessage(chatId, 'Время ебать свиней');
+      if (isLastPoll) {
+        return bot.sendMessage(chatId, 'Время ебать свиней');
+      }
     })
     .catch((err) => {
       console.error('Ошибка: ', err);

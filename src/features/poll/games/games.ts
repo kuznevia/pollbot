@@ -36,10 +36,12 @@ const checkGameTomorrow = async () => {
 const sendGamePoll = async (bot: TelegramBot) => {
   const tomorrowGames = await checkGameTomorrow();
   if (tomorrowGames.length) {
-    tomorrowGames.forEach((game) => {
-      sendPoll(bot, Number(chatId), game);
-    });
-    console.log('Автоматически отправлен опрос об игре');
+    for (const game of tomorrowGames) {
+      const isLastPoll =
+        tomorrowGames.indexOf(game) === tomorrowGames.length - 1;
+      await sendPoll(bot, Number(chatId), game, isLastPoll);
+      console.log('Автоматически отправлен опрос об игре');
+    }
   } else {
     console.log('Завтра нет игр');
   }
@@ -48,5 +50,6 @@ const sendGamePoll = async (bot: TelegramBot) => {
 export const scheduleGamePoll = (bot: TelegramBot) => {
   // Периодическая проверка расписания
   // Каждое утро в 11:00 мск
+  sendGamePoll(bot);
   cron.schedule('0 8 * * *', () => sendGamePoll(bot));
 };

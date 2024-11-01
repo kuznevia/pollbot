@@ -6,8 +6,9 @@ require('dotenv').config({
 });
 
 const token = process.env.BOT_TOKEN;
+const mongoURI = process.env.MONGO_URI;
 
-if (token) {
+if (token && mongoURI) {
   const bot = new TelegramBot(token, { polling: true });
 
   initBot(bot);

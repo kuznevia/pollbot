@@ -14,11 +14,10 @@ export const createGamePoll = (
     LeagueNameRu,
     ArenaRu,
   } = game;
-  const form = CompTeamNameAen === 'BIP LIONS' ? 'белая' : 'черная';
   const teamA = CompTeamNameAen.slice(0, 12);
   const teamB = CompTeamNameBen.slice(0, 12);
 
-  const pollQuestion = `${LeagueNameRu}\n${DisplayDateTimeMsk}\n${teamA} - ${teamB}\n${ArenaRu}\n Форма ${form}`;
+  const pollQuestion = `${LeagueNameRu}\n${DisplayDateTimeMsk}\n${teamA} - ${teamB}\n${ArenaRu}`;
   const options = ['Готов играть', 'Не готов'];
 
   return bot.sendPoll(Number(chatId), pollQuestion, options, {

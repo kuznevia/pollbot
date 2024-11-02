@@ -47,11 +47,10 @@ export const sendPoll = async (
     Poll.practice
   );
   if (isCreatedToday) {
-    const message = sender
-      ? `${sender}, на сегодня уже есть опрос, мразь`
-      : 'Не могу отправить регулярный опрос, какая-то мразь сделала это раньше меня';
-
-    bot.sendMessage(chatId, message);
+    if (sender) {
+      const message = `${sender}, на сегодня уже есть опрос, мразь`;
+      bot.sendMessage(chatId, message);
+    }
 
     return;
   }

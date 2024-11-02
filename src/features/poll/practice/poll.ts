@@ -30,7 +30,7 @@ export const sendPoll = async (
   const { isPolling } = state;
 
   // Проверяем, является ли сегодня понедельником или четвергом
-  if (!isMondayOrThursday()) {
+  if (sender && !isMondayOrThursday()) {
     bot.sendMessage(
       chatId,
       `${sender}, опросы можно создавать только по понедельникам и четвергам, мразь`
@@ -50,6 +50,8 @@ export const sendPoll = async (
     if (sender) {
       const message = `${sender}, на сегодня уже есть опрос, мразь`;
       bot.sendMessage(chatId, message);
+    } else {
+      console.log('Опрос уже создан');
     }
 
     return;

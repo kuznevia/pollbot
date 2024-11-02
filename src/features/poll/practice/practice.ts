@@ -18,6 +18,5 @@ const sendPracticePoll = (bot: TelegramBot) => {
 export const schedulePracticePoll = (bot: TelegramBot) => {
   // Периодическое создание опроса по расписанию
   // В понедельник и четверг в 10:00 мск
-  sendPracticePoll(bot);
   cron.schedule('0 7 * * 1,4', () => sendPracticePoll(bot));
 };

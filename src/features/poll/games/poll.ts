@@ -14,11 +14,10 @@ export const createGamePoll = (
     LeagueNameRu,
     ArenaRu,
   } = game;
-  const form = CompTeamNameAen === 'BIP LIONS' ? 'белая' : 'черная';
   const teamA = CompTeamNameAen.slice(0, 12);
   const teamB = CompTeamNameBen.slice(0, 12);
 
-  const pollQuestion = `${LeagueNameRu}\n${DisplayDateTimeMsk}\n${teamA} - ${teamB}\n${ArenaRu}\n Форма ${form}`;
+  const pollQuestion = `${LeagueNameRu}\n${DisplayDateTimeMsk}\n${teamA} - ${teamB}\n${ArenaRu}`;
   const options = ['Готов играть', 'Не готов'];
 
   return bot.sendPoll(Number(chatId), pollQuestion, options, {
@@ -26,7 +25,12 @@ export const createGamePoll = (
   });
 };
 
-export const sendPoll = (bot: TelegramBot, chatId: number, game: Game) => {
+export const sendPoll = (
+  bot: TelegramBot,
+  chatId: number,
+  game: Game,
+  isLastPoll: boolean
+) => {
   return createGamePoll(bot, Number(chatId), game)
     .then((pollMessage) => {
       //Добавляем сообщение закреп
@@ -34,7 +38,9 @@ export const sendPoll = (bot: TelegramBot, chatId: number, game: Game) => {
       return bot.pinChatMessage(chatId, messageId);
     })
     .then(() => {
-      return bot.sendMessage(chatId, 'Время ебать свиней');
+      if (isLastPoll) {
+        return bot.sendMessage(chatId, 'Время ебать свиней');
+      }
     })
     .catch((err) => {
       console.error('Ошибка: ', err);

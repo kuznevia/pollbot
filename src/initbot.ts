@@ -1,6 +1,6 @@
 import TelegramBot from 'node-telegram-bot-api';
 import { activateMessageReactions } from './features/messageReactions';
-import { scheduleGamePoll } from './features/poll/games';
+import { scheduleGamePoll, startGamePollListener } from './features/poll/games';
 import {
   startPracticePollListener,
   schedulePracticePoll,
@@ -14,6 +14,7 @@ export const initBot = (bot: TelegramBot) => {
   connectDB();
   setCommands(bot);
   startPracticePollListener(bot);
+  startGamePollListener(bot);
   schedulePracticePoll(bot);
   activateMessageReactions(bot);
   scheduleGamePoll(bot);

@@ -39,6 +39,14 @@ export const sendPoll = async (
     return;
   }
 
+  if (isPolling) {
+    bot.sendMessage(chatId, `${sender}, мразь, я занят, повтори позже`);
+
+    return;
+  }
+
+  state.isPolling = true;
+
   // Проверка, был ли уже создан опрос сегодня
   const db = await connectDB();
   const pollsCollection = db.collection('polls');
@@ -54,19 +62,10 @@ export const sendPoll = async (
       console.log('Опрос уже создан');
     }
 
-    return;
-  }
-
-  if (isPolling) {
-    bot.sendMessage(
-      chatId,
-      `${sender}, опоздал, мразь, уже создаю другой опрос`
-    );
+    state.isPolling = false;
 
     return;
   }
-
-  state.isPolling = true;
 
   bot
     .sendAnimation(chatId, gifPath)

@@ -1,40 +1,20 @@
-import express from 'express';
-import bodyParser from 'body-parser';
 import TelegramBot from 'node-telegram-bot-api';
 import { initBot } from './initbot';
 
 require('dotenv').config({
-  path: `.env.${process.env.NODE_ENV}`,
+  path: `.env.${process.env.NODE_ENV}`, // Загружает соответствующий файл .env
 });
 
 const token = process.env.BOT_TOKEN;
-const serverUrl = process.env.SERVER_URL;
-const app = express();
+const mongoURI = process.env.MONGO_URI;
 
-if (token) {
-  const bot = new TelegramBot(token);
+if (token && mongoURI) {
+  const bot = new TelegramBot(token, { polling: true });
 
-  // Настройка тела запроса
-  app.use(bodyParser.json());
+  initBot(bot);
 
-  // Определение маршрута для вебхука
-  app.post(`/webhook/${token}`, (req, res) => {
-    bot.processUpdate(req.body); // Обработка входящих обновлений
-    res.sendStatus(200); // Отправка успешного ответа
-  });
-
-  // Установка вебхука
-  const setWebhook = async () => {
-    const webhookUrl = `${serverUrl}webhook/${token}`;
-    await bot.setWebHook(webhookUrl); // Установка вебхука
-  };
-
-  // Запуск сервера
-  const PORT = process.env.PORT || 10000;
-  app.listen(PORT, async () => {
-    await setWebhook(); // Установка вебхука перед запуском
-    initBot(bot); // Инициализация бота после установки вебхука
-    console.log(`Сервер запущен на порту ${PORT}`);
+  bot.on('polling_error', (error) => {
+    console.error('Ошибка polling:', error);
   });
 } else {
   console.error('token is undefined');

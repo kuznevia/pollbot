@@ -30,7 +30,7 @@ export const sendPoll = async (
   const { isPolling } = state;
 
   // Проверяем, является ли сегодня понедельником или четвергом
-  if (!isMondayOrThursday()) {
+  if (sender && !isMondayOrThursday()) {
     bot.sendMessage(
       chatId,
       `${sender}, опросы можно создавать только по понедельникам и четвергам, мразь`
@@ -38,6 +38,14 @@ export const sendPoll = async (
 
     return;
   }
+
+  if (isPolling) {
+    bot.sendMessage(chatId, `${sender}, мразь, я занят, повтори позже`);
+
+    return;
+  }
+
+  state.isPolling = true;
 
   // Проверка, был ли уже создан опрос сегодня
   const db = await connectDB();
@@ -47,25 +55,17 @@ export const sendPoll = async (
     Poll.practice
   );
   if (isCreatedToday) {
-    const message = sender
-      ? `${sender}, на сегодня уже есть опрос, мразь`
-      : 'Не могу отправить регулярный опрос, какая-то мразь сделала это раньше меня';
+    if (sender) {
+      const message = `${sender}, на сегодня уже есть опрос, мразь`;
+      bot.sendMessage(chatId, message);
+    } else {
+      console.log('Опрос уже создан');
+    }
 
-    bot.sendMessage(chatId, message);
-
-    return;
-  }
-
-  if (isPolling) {
-    bot.sendMessage(
-      chatId,
-      `${sender}, опоздал, мразь, уже создаю другой опрос`
-    );
+    state.isPolling = false;
 
     return;
   }
-
-  state.isPolling = true;
 
   bot
     .sendAnimation(chatId, gifPath)

@@ -19,7 +19,7 @@ const createPoll = (bot: TelegramBot, chatId: TelegramBot.ChatId) => {
   });
 };
 
-export const sendPoll = async (
+export const sendPracticePoll = async (
   bot: TelegramBot,
   chatId: number,
   sender?: string

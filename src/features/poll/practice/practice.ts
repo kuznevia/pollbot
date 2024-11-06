@@ -1,22 +1,20 @@
 import TelegramBot from 'node-telegram-bot-api';
 import cron from 'node-cron';
-import { sendPoll } from './poll';
+import { sendPracticePoll } from './poll';
 import { chatId } from '../../../shared/consts/consts';
 
 export const startPracticePollListener = (bot: TelegramBot) => {
   // Команда для запуска опроса
   bot.onText(/\/poll/, (msg) => {
-    sendPoll(bot, msg.chat.id, msg.from?.first_name);
+    sendPracticePoll(bot, msg.chat.id, msg.from?.first_name);
   });
-};
-
-const sendPracticePoll = (bot: TelegramBot) => {
-  console.log('Пробую автоматически отправить опрос');
-  sendPoll(bot, Number(chatId));
 };
 
 export const schedulePracticePoll = (bot: TelegramBot) => {
   // Периодическое создание опроса по расписанию
   // В понедельник и четверг в 10:00 мск
-  cron.schedule('0 7 * * 1,4', () => sendPracticePoll(bot));
+  cron.schedule('0 10 * * 1,4', () => {
+    console.log('Пробую автоматически отправить опрос');
+    sendPracticePoll(bot, Number(chatId));
+  });
 };

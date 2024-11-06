@@ -57,7 +57,7 @@ const createPoll = (
     });
 };
 
-export const sendPoll = async (
+export const sendGamePoll = async (
   bot: TelegramBot,
   chatId: number,
   sender?: string

@@ -4,6 +4,7 @@
   "main": "pollbot.js",
   "scripts": {
     "start": "cross-env NODE_ENV=production node ./dist/pollbot.js",
+    "pm:build": "npm ci && npm run build",
     "pm:start": "pm2 start npm --name pollbot --time -- start",
     "pm:save": "pm2 save",
     "pm:logs": "pm2 logs pollbot",

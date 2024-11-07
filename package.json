@@ -4,6 +4,12 @@
   "main": "pollbot.js",
   "scripts": {
     "start": "cross-env NODE_ENV=production node ./dist/pollbot.js",
+    "pm:start": "pm2 start npm --name pollbot --time -- start",
+    "pm:save": "pm2 save",
+    "pm:logs": "pm2 logs pollbot",
+    "pm:restart": "pm2 restart pollbot",
+    "pm:stop": "pm2 stop all",
+    "pm:delete": "pm2 delete all",
     "dev": "cross-env NODE_ENV=development nodemon",
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",

@@ -6,6 +6,7 @@ export interface Game {
   DisplayDateTimeMsk: string;
   LeagueNameRu: string;
   GameDateTime: string;
+  GameID: number;
 }
 
 export type GamesResponse = Game[];

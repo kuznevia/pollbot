@@ -4,7 +4,7 @@ import { state } from '../../../shared/state/state';
 import {
   isMondayOrThursday,
   isPollCreatedToday,
-  saveLastPollDateToDB,
+  saveLastPollToDB,
 } from '../../../shared/utils/date';
 import { connectDB } from '../../../db/db';
 import { Poll } from '../model';
@@ -86,7 +86,7 @@ export const sendPracticePoll = async (
     })
     .finally(() => {
       // Обновляем и сохраняем дату последнего опроса
-      saveLastPollDateToDB(pollsCollection, Poll.practice);
+      saveLastPollToDB(pollsCollection, Poll.practice);
       state.isPolling = false;
     });
 };

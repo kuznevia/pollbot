@@ -80,6 +80,7 @@ export const sendGamePoll = async (
       chatId,
       `${sender}, опросы на игры могут создавать только тренер или хозяин, мразь`
     );
+    state.isPolling = false;
 
     return;
   }

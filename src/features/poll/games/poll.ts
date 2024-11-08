@@ -1,13 +1,13 @@
 import TelegramBot from 'node-telegram-bot-api';
 import { Game } from './model';
-import { checkGameTomorrow } from './utils/checkGameTommorow';
 import { state } from '../../../shared/state/state';
 import { Poll } from '../model';
 import {
-  isPollCreatedToday,
-  saveLastPollDateToDB,
+  isPollForGameCreated,
+  saveLastPollToDB,
 } from '../../../shared/utils/date';
 import { connectDB } from '../../../db/db';
+import { findNextGames } from './utils/findNextGame';
 
 // Регулярный опрос на игру
 const createGamePoll = (
@@ -25,7 +25,7 @@ const createGamePoll = (
   const teamA = CompTeamNameAen.slice(0, 12);
   const teamB = CompTeamNameBen.slice(0, 12);
 
-  const pollQuestion = `${LeagueNameRu}\n${DisplayDateTimeMsk}\n${teamA} - ${teamB}\n${ArenaRu}`;
+  const pollQuestion = `${LeagueNameRu}\u000A${DisplayDateTimeMsk}\u000A${teamA} - ${teamB}\u000A${ArenaRu}`;
   const options = ['Готов ебать', 'Не готов'];
 
   return bot.sendPoll(Number(chatId), pollQuestion, options, {
@@ -72,18 +72,34 @@ export const sendGamePoll = async (
 
   state.isPolling = true;
 
+  const isCoachOrOwner =
+    sender === 'Alexey' || sender === 'Viacheslav' || sender === 'Никита';
+
+  if (sender && !isCoachOrOwner) {
+    bot.sendMessage(
+      chatId,
+      `${sender}, опросы на игры могут создавать только тренер или хозяин, мразь`
+    );
+
+    return;
+  }
+
   const db = await connectDB();
   const pollsCollection = db.collection('polls');
-  const tomorrowGames = await checkGameTomorrow();
-  if (tomorrowGames.length) {
-    // Проверка, был ли уже создан опрос сегодня
-    const isCreatedToday = await isPollCreatedToday(pollsCollection, Poll.game);
-    if (isCreatedToday) {
+  const nextGames = await findNextGames();
+  if (nextGames.length) {
+    // Проверка, был ли уже создан опрос на эту игру
+    const isCreatedForThatGame = await isPollForGameCreated(
+      pollsCollection,
+      Poll.game,
+      nextGames[0].GameID
+    );
+    if (isCreatedForThatGame) {
       if (sender) {
-        const message = `${sender}, на сегодня уже есть опрос, мразь`;
+        const message = `${sender}, на следующую игру уже есть опрос, мразь`;
         bot.sendMessage(chatId, message);
       } else {
-        console.log('Опрос уже создан');
+        console.log('Опрос на эту игру уже создан');
       }
 
       state.isPolling = false;
@@ -91,19 +107,18 @@ export const sendGamePoll = async (
       return;
     }
 
-    for (const game of tomorrowGames) {
-      const isLastPoll =
-        tomorrowGames.indexOf(game) === tomorrowGames.length - 1;
+    for (const game of nextGames) {
+      const isLastPoll = nextGames.indexOf(game) === nextGames.length - 1;
       await createPoll(bot, Number(chatId), game, isLastPoll);
+      await saveLastPollToDB(pollsCollection, Poll.game, game.GameID);
       console.log('Автоматически отправлен опрос об игре');
     }
-    await saveLastPollDateToDB(pollsCollection, Poll.game);
   } else {
     if (sender) {
-      const message = `${sender}, завтра нет игр`;
+      const message = `${sender}, в расписании нет игр`;
       await bot.sendMessage(chatId, message);
     } else {
-      console.log('Завтра нет игр');
+      console.log('В расписании нет игр');
     }
   }
 

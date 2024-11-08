@@ -1,6 +1,6 @@
 {
   "name": "pollbot",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "main": "pollbot.js",
   "scripts": {
     "start": "cross-env NODE_ENV=production node ./dist/pollbot.js",

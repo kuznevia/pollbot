@@ -6,7 +6,7 @@ import {
   isPollCreatedToday,
   saveLastPollToDB,
 } from '../../../shared/utils/date';
-import { connectDB } from '../../../db/db';
+import { connectDB } from '../../../bot/db/utils';
 import { Poll } from '../model';
 
 // Регулярный опрос на тренировку

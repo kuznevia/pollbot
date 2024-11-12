@@ -6,7 +6,7 @@ import {
   isPollForGameCreated,
   saveLastPollToDB,
 } from '../../../shared/utils/date';
-import { connectDB } from '../../../db/db';
+import { connectDB } from '../../../bot/db/utils';
 import { findNextGames } from './utils/findNextGame';
 
 // Регулярный опрос на игру

@@ -1,6 +1,6 @@
 import TelegramBot from 'node-telegram-bot-api';
 import { state } from '../../shared/state/state';
-import { connectDB } from '../../db/db';
+import { connectDB } from '../../bot/db/utils';
 
 export const startDropDbListener = (bot: TelegramBot) => {
   // Команда для дропа бд

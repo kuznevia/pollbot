@@ -5,15 +5,11 @@ import {
   startPracticePollListener,
   schedulePracticePoll,
 } from './features/poll/practice';
-import { setCommands } from './features/setCommands';
 import { startHealthCheckListener } from './features/healthcheck';
-import { connectDB } from './db/db';
 import { startDropDbListener } from './features/dropdb';
 
 // Инициализация команд и функционала бота
 export const initBot = (bot: TelegramBot) => {
-  connectDB();
-  setCommands(bot);
   startPracticePollListener(bot);
   startGamePollListener(bot);
   schedulePracticePoll(bot);

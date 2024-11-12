@@ -1,3 +1,4 @@
+import { startChatIdListener } from '../../features/chatId';
 import { startDropDbListener } from '../../features/dropdb';
 import { startHealthCheckListener } from '../../features/healthcheck';
 import { activateMessageReactions } from '../../features/messageReactions';
@@ -33,14 +34,17 @@ export class BotListeners {
     this.listeners.push(startDropDbListener);
   }
 
+  addChatIdListener() {
+    this.listeners.push(startChatIdListener);
+  }
+
   addAllListeners() {
     this.addPracticePollListener();
     this.addGamePollListener();
-    // this.listeners.push(schedulePracticePoll);
     this.addMessageReactionsListener();
-    // this.listeners.push(scheduleGamePoll);
     this.addHealthCheckListener();
     this.addDropDbListener();
+    this.addChatIdListener();
   }
 
   startListening(bot: PollBot) {

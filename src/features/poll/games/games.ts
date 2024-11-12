@@ -1,17 +1,17 @@
-import TelegramBot from 'node-telegram-bot-api';
 import cron from 'node-cron';
 import { sendGamePoll } from './poll';
 import { chatId } from '../../../shared/consts/consts';
 import { checkGameTomorrow } from './utils/checkGameTommorow';
+import { PollBot } from '../../../bot';
 
-export const startGamePollListener = (bot: TelegramBot) => {
+export const startGamePollListener = (bot: PollBot) => {
   // Команда для запуска опроса
-  bot.onText(/\/game/, (msg) => {
-    sendGamePoll(bot, msg.chat.id, msg.from?.first_name);
+  bot.onText(/\/game/, async (msg) => {
+    await sendGamePoll(bot, msg.chat.id, msg.from?.first_name);
   });
 };
 
-export const scheduleGamePoll = (bot: TelegramBot) => {
+export const scheduleGamePoll = (bot: PollBot) => {
   // Периодическая проверка расписания
   // Каждое утро в 11:00 мск
   cron.schedule('0 11 * * *', async () => {

@@ -1,13 +1,13 @@
 import TelegramBot from 'node-telegram-bot-api';
 import { Game } from './model';
-import { state } from '../../../shared/state/state';
 import { Poll } from '../model';
 import {
   isPollForGameCreated,
   saveLastPollToDB,
 } from '../../../shared/utils/date';
-import { connectDB } from '../../../bot/db/utils';
 import { findNextGames } from './utils/findNextGame';
+import { PollBotError } from '../../../shared/model/model';
+import { PollBot } from '../../../bot';
 
 // Регулярный опрос на игру
 const createGamePoll = (
@@ -34,7 +34,7 @@ const createGamePoll = (
 };
 
 const createPoll = (
-  bot: TelegramBot,
+  bot: PollBot,
   chatId: number,
   game: Game,
   isLastPoll: boolean
@@ -58,70 +58,69 @@ const createPoll = (
 };
 
 export const sendGamePoll = async (
-  bot: TelegramBot,
+  bot: PollBot,
   chatId: number,
   sender?: string
 ) => {
-  const { isPolling } = state;
+  try {
+    const isCoachOrOwner =
+      sender === 'Alexey' || sender === 'Viacheslav' || sender === 'Никита';
 
-  if (isPolling) {
-    bot.sendMessage(chatId, `${sender}, мразь, я занят, повтори позже`);
-
-    return;
-  }
-
-  state.isPolling = true;
-
-  const isCoachOrOwner =
-    sender === 'Alexey' || sender === 'Viacheslav' || sender === 'Никита';
-
-  if (sender && !isCoachOrOwner) {
-    bot.sendMessage(
-      chatId,
-      `${sender}, опросы на игры могут создавать только тренер или хозяин, мразь`
-    );
-    state.isPolling = false;
-
-    return;
-  }
-
-  const db = await connectDB();
-  const pollsCollection = db.collection('polls');
-  const nextGames = await findNextGames();
-  if (nextGames.length) {
-    // Проверка, был ли уже создан опрос на эту игру
-    const isCreatedForThatGame = await isPollForGameCreated(
-      pollsCollection,
-      Poll.game,
-      nextGames[0].GameID
-    );
-    if (isCreatedForThatGame) {
-      if (sender) {
-        const message = `${sender}, на следующую игру уже есть опрос, мразь`;
-        bot.sendMessage(chatId, message);
-      } else {
-        console.log('Опрос на эту игру уже создан');
-      }
-
-      state.isPolling = false;
+    if (sender && !isCoachOrOwner) {
+      bot.sendMessage(
+        chatId,
+        `${sender}, опросы на игры могут создавать только тренер или хозяин, мразь`
+      );
 
       return;
     }
 
-    for (const game of nextGames) {
-      const isLastPoll = nextGames.indexOf(game) === nextGames.length - 1;
-      await createPoll(bot, Number(chatId), game, isLastPoll);
-      await saveLastPollToDB(pollsCollection, Poll.game, game.GameID);
-      console.log('Автоматически отправлен опрос об игре');
+    const db = await bot.connectDB();
+    const pollsCollection = db?.collection('polls');
+    const nextGames = await findNextGames();
+    if (nextGames.length) {
+      // Проверка, был ли уже создан опрос на эту игру
+      const isCreatedForThatGame =
+        pollsCollection &&
+        (await isPollForGameCreated(
+          pollsCollection,
+          Poll.game,
+          nextGames[0].GameID
+        ));
+
+      if (isCreatedForThatGame) {
+        if (sender) {
+          const message = `${sender}, на следующую игру уже есть опрос, мразь`;
+          bot.sendMessage(chatId, message);
+
+          return;
+        }
+        console.log('Опрос на эту игру уже создан');
+
+        return;
+      }
+
+      for (const game of nextGames) {
+        const isLastPoll = nextGames.indexOf(game) === nextGames.length - 1;
+        await createPoll(bot, Number(chatId), game, isLastPoll);
+        pollsCollection &&
+          (await saveLastPollToDB(pollsCollection, Poll.game, game.GameID));
+      }
+
+      return;
     }
-  } else {
+
+    //Если в расписании нет игр
     if (sender) {
       const message = `${sender}, в расписании нет игр`;
       await bot.sendMessage(chatId, message);
-    } else {
-      console.log('В расписании нет игр');
-    }
-  }
 
-  state.isPolling = false;
+      return;
+    }
+    console.log('В расписании нет игр');
+  } catch (err) {
+    const error = err as PollBotError;
+    const errorMessage = error?.response?.body?.description;
+    bot.sendMessage(chatId, `Ошибка, братья, \n${errorMessage}`);
+  }
 };

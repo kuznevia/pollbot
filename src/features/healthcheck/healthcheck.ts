@@ -1,6 +1,6 @@
-import TelegramBot from 'node-telegram-bot-api';
+import { PollBot } from '../../bot';
 
-export const startHealthCheckListener = (bot: TelegramBot) => {
+export const startHealthCheckListener = (bot: PollBot) => {
   // Команда для пинания бота
   bot.onText(/\/check/, (msg) => {
     const chatId = msg.chat.id;

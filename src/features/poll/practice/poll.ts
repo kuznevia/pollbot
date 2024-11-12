@@ -1,16 +1,16 @@
 import TelegramBot from 'node-telegram-bot-api';
 import { ROUTES } from '../../../shared/routes/routes';
-import { state } from '../../../shared/state/state';
 import {
   isMondayOrThursday,
   isPollCreatedToday,
   saveLastPollToDB,
 } from '../../../shared/utils/date';
-import { connectDB } from '../../../bot/db/utils';
 import { Poll } from '../model';
+import { PollBotError } from '../../../shared/model/model';
+import { PollBot } from '../../../bot';
 
 // Регулярный опрос на тренировку
-const createPoll = (bot: TelegramBot, chatId: TelegramBot.ChatId) => {
+const createPoll = (bot: PollBot, chatId: TelegramBot.ChatId) => {
   const pollQuestion = 'Тренировка в 22:00';
   const options = ['Да', 'Нет', 'Не знаю'];
 
@@ -20,73 +20,55 @@ const createPoll = (bot: TelegramBot, chatId: TelegramBot.ChatId) => {
 };
 
 export const sendPracticePoll = async (
-  bot: TelegramBot,
+  bot: PollBot,
   chatId: number,
   sender?: string
 ) => {
   // Путь к локальному GIF файлу
   const gifPath = ROUTES.HELLO_JPG;
 
-  const { isPolling } = state;
+  try {
+    // Проверяем, является ли сегодня понедельником или четвергом
+    if (sender && !isMondayOrThursday()) {
+      bot.sendMessage(
+        chatId,
+        `${sender}, опросы можно создавать только по понедельникам и четвергам, мразь`
+      );
 
-  // Проверяем, является ли сегодня понедельником или четвергом
-  if (sender && !isMondayOrThursday()) {
-    bot.sendMessage(
-      chatId,
-      `${sender}, опросы можно создавать только по понедельникам и четвергам, мразь`
-    );
-
-    return;
-  }
-
-  if (isPolling) {
-    bot.sendMessage(chatId, `${sender}, мразь, я занят, повтори позже`);
-
-    return;
-  }
-
-  state.isPolling = true;
-
-  // Проверка, был ли уже создан опрос сегодня
-  const db = await connectDB();
-  const pollsCollection = db.collection('polls');
-  const isCreatedToday = await isPollCreatedToday(
-    pollsCollection,
-    Poll.practice
-  );
-  if (isCreatedToday) {
-    if (sender) {
-      const message = `${sender}, на сегодня уже есть опрос, мразь`;
-      bot.sendMessage(chatId, message);
-    } else {
-      console.log('Опрос уже создан');
+      return;
     }
 
-    state.isPolling = false;
+    // Проверка, был ли уже создан опрос сегодня
+    const db = await bot.connectDB();
+    const pollsCollection = db?.collection('polls');
+    const isCreatedToday =
+      pollsCollection &&
+      (await isPollCreatedToday(pollsCollection, Poll.practice));
 
-    return;
+    if (isCreatedToday) {
+      if (sender) {
+        const message = `${sender}, на сегодня уже есть опрос, мразь`;
+        bot.sendMessage(chatId, message);
+      } else {
+        console.log('Опрос уже создан');
+      }
+
+      return;
+    }
+
+    await bot.sendAnimation(chatId, gifPath);
+    const pollMessage = await createPoll(bot, chatId);
+    await bot.pinChatMessage(chatId, pollMessage.message_id);
+    await bot.sendMessage(
+      chatId,
+      sender ? 'Гойда, братья' : 'Опередил вас, дрочилы'
+    );
+
+    // Сохраняем дату последнего опроса
+    pollsCollection && (await saveLastPollToDB(pollsCollection, Poll.practice));
+  } catch (err) {
+    const error = err as PollBotError;
+    const errorMessage = error?.response?.body?.description;
+    bot.sendMessage(chatId, `Ошибка, братья, \n${errorMessage}`);
   }
-
-  bot
-    .sendAnimation(chatId, gifPath)
-    .then(() => createPoll(bot, chatId))
-    .then((pollMessage) => {
-      //Добавляем сообщение закреп
-      const messageId = pollMessage.message_id;
-      return bot.pinChatMessage(chatId, messageId);
-    })
-    .then(() => {
-      const message = sender ? 'Гойда, братья' : 'Опередил вас, дрочилы';
-      return bot.sendMessage(chatId, message);
-    })
-    .catch((err) => {
-      console.error('Ошибка: ', err);
-      const errorMessage = err?.response?.body?.description;
-      bot.sendMessage(chatId, `Ошибка, братья, \n${errorMessage}`);
-    })
-    .finally(() => {
-      // Обновляем и сохраняем дату последнего опроса
-      saveLastPollToDB(pollsCollection, Poll.practice);
-      state.isPolling = false;
-    });
 };

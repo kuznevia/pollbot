@@ -18,6 +18,7 @@ export const findNextGames = async () => {
         new Date(getGameDateMilliseconds(GameDateTime)) > now
     );
 
+    //Находим дату ближайшей игры
     const nextGameDate = futureGames.reduce(
       (minDate, { GameDateTime }) => {
         const gameDate = new Date(getGameDateMilliseconds(GameDateTime));
@@ -29,7 +30,7 @@ export const findNextGames = async () => {
     // Фильтруем игры на ближайшую дату
     const nextGames = futureGames.filter(({ GameDateTime }) => {
       const gameDate = new Date(getGameDateMilliseconds(GameDateTime));
-      return gameDate.getDate() === nextGameDate.getDate();
+      return gameDate.toDateString() === nextGameDate.toDateString();
     });
 
     return nextGames;

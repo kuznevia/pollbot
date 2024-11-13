@@ -6,7 +6,7 @@ import { getChatId, getSender } from '../../../shared/utils/utils';
 
 export const startPracticePollListener = (bot: PollBot) => {
   // Команда для запуска опроса
-  bot.onText(/\/poll/, async (msg) => {
+  bot.onText(/\/practice/, async (msg) => {
     const chatId = getChatId(msg);
     const sender = getSender(msg);
 

@@ -8,8 +8,11 @@ import {
 import { Poll } from '../model';
 import { PollBotError } from '../../../shared/model/model';
 import { PollBot } from '../../../bot';
-import { defaultAppeal } from '../../../shared/consts/consts';
-import { envConfig } from '../../../shared/config/config';
+import {
+  defaultAppeal,
+  letsGoMessage,
+  outranMessage,
+} from '../../../shared/consts/consts';
 import { isBot } from '../../../shared/utils/utils';
 
 // Регулярный опрос на тренировку
@@ -32,7 +35,7 @@ export const sendPracticePoll = async (
 
   try {
     // Проверяем, является ли сегодня понедельником или четвергом
-    if (isMondayOrThursday()) {
+    if (!isMondayOrThursday()) {
       bot.sendMessage(
         chatId,
         `${sender}, опросы можно создавать только по понедельникам и четвергам, ${defaultAppeal}`
@@ -57,12 +60,10 @@ export const sendPracticePoll = async (
       return;
     }
 
-    const outranMessage = envConfig.get('OUTRAN_MESSAGE');
-
     await bot.sendAnimation(chatId, gifPath);
     const pollMessage = await createPoll(bot, chatId);
     await bot.pinChatMessage(chatId, pollMessage.message_id);
-    await bot.sendMessage(chatId, sender ? 'Гойда, братья' : outranMessage);
+    await bot.sendMessage(chatId, sender ? letsGoMessage : outranMessage);
 
     // Сохраняем дату последнего опроса
     pollsCollection && (await saveLastPollToDB(pollsCollection, Poll.practice));

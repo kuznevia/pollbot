@@ -8,9 +8,9 @@ import {
 import { findNextGames } from './utils/findNextGame';
 import { PollBotError } from '../../../shared/model/model';
 import { PollBot } from '../../../bot';
-import { envConfig } from '../../../shared/config/config';
-import { defaultAppeal } from '../../../shared/consts/consts';
+import { defaultAppeal, gamePollMessage } from '../../../shared/consts/consts';
 import { isAdminOrBot, isBot } from '../../../shared/utils/utils';
+import { ROUTES } from '../../../shared/routes/routes';
 
 // Регулярный опрос на игру
 const createGamePoll = (
@@ -50,8 +50,7 @@ const createPoll = (
     })
     .then(() => {
       if (isLastPoll) {
-        const message = envConfig.get('GAME_POLL_MESSAGE');
-        return bot.sendMessage(chatId, message);
+        return bot.sendMessage(chatId, gamePollMessage);
       }
     })
     .catch((err) => {
@@ -106,6 +105,10 @@ export const sendGamePoll = async (
 
       return;
     }
+
+    // Путь к локальному GIF файлу
+    const gifPath = ROUTES.HELLO_JPG;
+    await bot.sendAnimation(chatId, gifPath);
 
     for (const game of nextGames) {
       const isLastPoll = nextGames.indexOf(game) === nextGames.length - 1;

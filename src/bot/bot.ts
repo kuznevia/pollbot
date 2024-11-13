@@ -83,7 +83,7 @@ export class PollBot extends TelegramBot {
     chatId: TelegramBot.ChatId,
     text: string,
     options?: PollBotMessageOptions
-  ): Promise<TelegramBot.Message> | undefined {
+  ): Promise<TelegramBot.Message> | void {
     const isBotSender = options?.isBotSender;
 
     if (isBotSender) {

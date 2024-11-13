@@ -1,12 +1,11 @@
 import { Db, MongoClient } from 'mongodb';
-import { envConfig } from '../../shared/config/config';
+import { mongoURI } from '../../shared/consts/consts';
 
 export class DB {
   client: MongoClient;
   connection: Db | null = null;
   constructor() {
-    const uri = envConfig.get('MONGO_URI');
-    this.client = new MongoClient(uri!);
+    this.client = new MongoClient(mongoURI);
   }
 
   async connect() {

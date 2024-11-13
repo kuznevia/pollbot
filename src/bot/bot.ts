@@ -3,7 +3,9 @@ import { DB } from './db/DB';
 import { commands } from './commands';
 import { BotListeners } from './plugins/listeners';
 import { BotScheduler } from './plugins/scheduledActions';
-import { BotState } from './model';
+import { BotState, PollBotMessageOptions } from './model';
+import { defaultAppeal } from '../shared/consts/consts';
+import { getChatId, getSender } from '../shared/utils/utils';
 export class PollBot extends TelegramBot {
   db: DB;
   listener: BotListeners;
@@ -52,11 +54,14 @@ export class PollBot extends TelegramBot {
     ) => Promise<void> | void
   ): void {
     super.onText(regexp, async (msg, match) => {
-      const chatId = msg.chat.id;
-      const sender = msg.from?.first_name;
+      const chatId = getChatId(msg);
+      const sender = getSender(msg);
 
       if (this.isPending()) {
-        this.sendMessage(chatId, `${sender}, мразь, я занят, повтори позже`);
+        this.sendMessage(
+          chatId,
+          `${sender}, ${defaultAppeal}, я занят, повтори позже`
+        );
 
         return;
       }
@@ -69,5 +74,24 @@ export class PollBot extends TelegramBot {
         this.setIdleState();
       }
     });
+  }
+
+  /**
+   * Проверяет, является ли бот инициатором события, чтобы не отправлять сообщения в чат самому себе
+   */
+  sendMessageOrConsole(
+    chatId: TelegramBot.ChatId,
+    text: string,
+    options?: PollBotMessageOptions
+  ): Promise<TelegramBot.Message> | undefined {
+    const isBotSender = options?.isBotSender;
+
+    if (isBotSender) {
+      console.log(text);
+
+      return;
+    }
+
+    return super.sendMessage(chatId, text, options);
   }
 }

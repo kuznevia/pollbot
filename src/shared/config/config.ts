@@ -9,7 +9,10 @@ class EnvConfig {
       process.env.NODE_ENV === 'production'
         ? '.env.production'
         : '.env.development';
+
+    dotenv.config();
     dotenv.config({ path: envFile });
+
     this.envVariables = Object.fromEntries(
       Object.entries(process.env).filter(([, value]) => value !== undefined)
     ) as Record<string, string>;

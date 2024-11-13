@@ -8,6 +8,9 @@ import {
 import { Poll } from '../model';
 import { PollBotError } from '../../../shared/model/model';
 import { PollBot } from '../../../bot';
+import { defaultAppeal } from '../../../shared/consts/consts';
+import { envConfig } from '../../../shared/config/config';
+import { isBot } from '../../../shared/utils/utils';
 
 // Регулярный опрос на тренировку
 const createPoll = (bot: PollBot, chatId: TelegramBot.ChatId) => {
@@ -22,17 +25,17 @@ const createPoll = (bot: PollBot, chatId: TelegramBot.ChatId) => {
 export const sendPracticePoll = async (
   bot: PollBot,
   chatId: number,
-  sender?: string
+  sender: string
 ) => {
   // Путь к локальному GIF файлу
   const gifPath = ROUTES.HELLO_JPG;
 
   try {
     // Проверяем, является ли сегодня понедельником или четвергом
-    if (sender && !isMondayOrThursday()) {
+    if (isMondayOrThursday()) {
       bot.sendMessage(
         chatId,
-        `${sender}, опросы можно создавать только по понедельникам и четвергам, мразь`
+        `${sender}, опросы можно создавать только по понедельникам и четвергам, ${defaultAppeal}`
       );
 
       return;
@@ -46,23 +49,20 @@ export const sendPracticePoll = async (
       (await isPollCreatedToday(pollsCollection, Poll.practice));
 
     if (isCreatedToday) {
-      if (sender) {
-        const message = `${sender}, на сегодня уже есть опрос, мразь`;
-        bot.sendMessage(chatId, message);
-      } else {
-        console.log('Опрос уже создан');
-      }
+      const message = `${sender}, на сегодня уже есть опрос, ${defaultAppeal}`;
+      await bot.sendMessageOrConsole(chatId, message, {
+        isBotSender: isBot(sender),
+      });
 
       return;
     }
 
+    const outranMessage = envConfig.get('OUTRAN_MESSAGE');
+
     await bot.sendAnimation(chatId, gifPath);
     const pollMessage = await createPoll(bot, chatId);
     await bot.pinChatMessage(chatId, pollMessage.message_id);
-    await bot.sendMessage(
-      chatId,
-      sender ? 'Гойда, братья' : 'Опередил вас, дрочилы'
-    );
+    await bot.sendMessage(chatId, sender ? 'Гойда, братья' : outranMessage);
 
     // Сохраняем дату последнего опроса
     pollsCollection && (await saveLastPollToDB(pollsCollection, Poll.practice));

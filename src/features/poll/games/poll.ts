@@ -8,6 +8,9 @@ import {
 import { findNextGames } from './utils/findNextGame';
 import { PollBotError } from '../../../shared/model/model';
 import { PollBot } from '../../../bot';
+import { envConfig } from '../../../shared/config/config';
+import { defaultAppeal } from '../../../shared/consts/consts';
+import { isAdminOrBot, isBot } from '../../../shared/utils/utils';
 
 // Регулярный опрос на игру
 const createGamePoll = (
@@ -47,7 +50,8 @@ const createPoll = (
     })
     .then(() => {
       if (isLastPoll) {
-        return bot.sendMessage(chatId, 'Время ебать свиней');
+        const message = envConfig.get('GAME_POLL_MESSAGE');
+        return bot.sendMessage(chatId, message);
       }
     })
     .catch((err) => {
@@ -60,16 +64,13 @@ const createPoll = (
 export const sendGamePoll = async (
   bot: PollBot,
   chatId: number,
-  sender?: string
+  sender: string
 ) => {
   try {
-    const isCoachOrOwner =
-      sender === 'Alexey' || sender === 'Viacheslav' || sender === 'Никита';
-
-    if (sender && !isCoachOrOwner) {
+    if (!isAdminOrBot(sender)) {
       bot.sendMessage(
         chatId,
-        `${sender}, опросы на игры могут создавать только тренер или хозяин, мразь`
+        `${sender}, опросы на игры могут создавать только тренер или хозяин, ${defaultAppeal}`
       );
 
       return;
@@ -78,46 +79,40 @@ export const sendGamePoll = async (
     const db = await bot.connectDB();
     const pollsCollection = db?.collection('polls');
     const nextGames = await findNextGames();
-    if (nextGames.length) {
-      // Проверка, был ли уже создан опрос на эту игру
-      const isCreatedForThatGame =
-        pollsCollection &&
-        (await isPollForGameCreated(
-          pollsCollection,
-          Poll.game,
-          nextGames[0].GameID
-        ));
 
-      if (isCreatedForThatGame) {
-        if (sender) {
-          const message = `${sender}, на следующую игру уже есть опрос, мразь`;
-          bot.sendMessage(chatId, message);
-
-          return;
-        }
-        console.log('Опрос на эту игру уже создан');
-
-        return;
-      }
-
-      for (const game of nextGames) {
-        const isLastPoll = nextGames.indexOf(game) === nextGames.length - 1;
-        await createPoll(bot, Number(chatId), game, isLastPoll);
-        pollsCollection &&
-          (await saveLastPollToDB(pollsCollection, Poll.game, game.GameID));
-      }
-
-      return;
-    }
-
-    //Если в расписании нет игр
-    if (sender) {
+    if (!nextGames.length) {
       const message = `${sender}, в расписании нет игр`;
-      await bot.sendMessage(chatId, message);
+      await bot.sendMessageOrConsole(chatId, message, {
+        isBotSender: isBot(sender),
+      });
 
       return;
     }
-    console.log('В расписании нет игр');
+
+    // Проверка, был ли уже создан опрос на эту игру
+    const isCreatedForThatGame =
+      pollsCollection &&
+      (await isPollForGameCreated(
+        pollsCollection,
+        Poll.game,
+        nextGames[0].GameID
+      ));
+
+    if (isCreatedForThatGame) {
+      const message = `${sender}, на следующую игру уже есть опрос, ${defaultAppeal}`;
+      await bot.sendMessageOrConsole(chatId, message, {
+        isBotSender: isBot(sender),
+      });
+
+      return;
+    }
+
+    for (const game of nextGames) {
+      const isLastPoll = nextGames.indexOf(game) === nextGames.length - 1;
+      await createPoll(bot, Number(chatId), game, isLastPoll);
+      pollsCollection &&
+        (await saveLastPollToDB(pollsCollection, Poll.game, game.GameID));
+    }
   } catch (err) {
     const error = err as PollBotError;
     const errorMessage = error?.response?.body?.description;

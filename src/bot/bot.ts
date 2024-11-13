@@ -4,11 +4,6 @@ import { commands } from './commands';
 import { BotListeners } from './plugins/listeners';
 import { BotScheduler } from './plugins/scheduledActions';
 import { BotState } from './model';
-
-require('dotenv').config({
-  path: `.env.${process.env.NODE_ENV}`, // Загружает соответствующий файл .env
-});
-
 export class PollBot extends TelegramBot {
   db: DB;
   listener: BotListeners;

@@ -1,15 +1,11 @@
 import { Db, MongoClient } from 'mongodb';
-
-require('dotenv').config({
-  path: `.env.${process.env.NODE_ENV}`, // Загружает соответствующий файл .env
-});
-
-const uri = process.env.MONGO_URI;
+import { envConfig } from '../../shared/config/config';
 
 export class DB {
   client: MongoClient;
   connection: Db | null = null;
   constructor() {
+    const uri = envConfig.get('MONGO_URI');
     this.client = new MongoClient(uri!);
   }
 

@@ -1,5 +1,3 @@
-require('dotenv').config({
-  path: `.env.${process.env.NODE_ENV}`, // Загружает соответствующий файл .env
-});
+import { envConfig } from '../config/config';
 
-export const chatId = process.env.CHAT_ID;
+export const chatId = envConfig.get('CHAT_ID');

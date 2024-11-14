@@ -18,7 +18,7 @@ export const startDropDbListener = (bot: PollBot) => {
     }
 
     const db = await bot.connectDB();
-    await db?.dropDatabase();
+    await db.dropDatabase();
     bot.sendMessage(chatId, `${sender}, БД дропнута`);
   });
 };

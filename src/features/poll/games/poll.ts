@@ -76,7 +76,7 @@ export const sendGamePoll = async (
     }
 
     const db = await bot.connectDB();
-    const pollsCollection = db?.collection('polls');
+    const pollsCollection = db.collection('polls');
     const nextGames = await findNextGames();
 
     if (!nextGames.length) {
@@ -89,13 +89,11 @@ export const sendGamePoll = async (
     }
 
     // Проверка, был ли уже создан опрос на эту игру
-    const isCreatedForThatGame =
-      pollsCollection &&
-      (await isPollForGameCreated(
-        pollsCollection,
-        Poll.game,
-        nextGames[0].GameID
-      ));
+    const isCreatedForThatGame = await isPollForGameCreated(
+      pollsCollection,
+      Poll.game,
+      nextGames[0].GameID
+    );
 
     if (isCreatedForThatGame) {
       const message = `${sender}, на следующую игру уже есть опрос, ${defaultAppeal}`;
@@ -113,8 +111,7 @@ export const sendGamePoll = async (
     for (const game of nextGames) {
       const isLastPoll = nextGames.indexOf(game) === nextGames.length - 1;
       await createPoll(bot, Number(chatId), game, isLastPoll);
-      pollsCollection &&
-        (await saveLastPollToDB(pollsCollection, Poll.game, game.GameID));
+      await saveLastPollToDB(pollsCollection, Poll.game, game.GameID);
     }
   } catch (err) {
     const error = err as PollBotError;

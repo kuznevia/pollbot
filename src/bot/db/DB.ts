@@ -15,7 +15,7 @@ export class DB {
         console.log('Подключение к MongoDB успешно!');
         this.connection = this.client.db('pollbotDB');
       } catch (error) {
-        console.error(error);
+        throw new Error(`Can't connect to DB, error: ${error}`);
       }
     }
 

@@ -46,10 +46,11 @@ export const sendPracticePoll = async (
 
     // Проверка, был ли уже создан опрос сегодня
     const db = await bot.connectDB();
-    const pollsCollection = db?.collection('polls');
-    const isCreatedToday =
-      pollsCollection &&
-      (await isPollCreatedToday(pollsCollection, Poll.practice));
+    const pollsCollection = db.collection('polls');
+    const isCreatedToday = await isPollCreatedToday(
+      pollsCollection,
+      Poll.practice
+    );
 
     if (isCreatedToday) {
       const message = `${sender}, на сегодня уже есть опрос, ${defaultAppeal}`;
@@ -66,7 +67,7 @@ export const sendPracticePoll = async (
     await bot.sendMessage(chatId, sender ? letsGoMessage : outranMessage);
 
     // Сохраняем дату последнего опроса
-    pollsCollection && (await saveLastPollToDB(pollsCollection, Poll.practice));
+    await saveLastPollToDB(pollsCollection, Poll.practice);
   } catch (err) {
     const error = err as PollBotError;
     const errorMessage = error?.response?.body?.description;

@@ -1,11 +1,8 @@
 import TelegramBot from 'node-telegram-bot-api';
 import { botName, coachName, creatorName, ownerName } from '../consts/consts';
 
-export const isAdminOrBot = (sender?: string) =>
-  sender === coachName ||
-  sender === creatorName ||
-  sender === ownerName ||
-  sender === botName;
+export const isAdminOrBot = (sender: string) =>
+  [coachName, creatorName, ownerName, botName].includes(sender);
 
 export const isCreator = (sender?: string) => sender === creatorName;
 

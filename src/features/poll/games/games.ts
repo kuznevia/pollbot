@@ -16,8 +16,8 @@ export const startGamePollListener = (bot: PollBot) => {
 };
 
 const schedulePollEveryMorning11AM = async (bot: PollBot) => {
-  const tommorrowGames = await checkGameTomorrow();
-  if (tommorrowGames.length) {
+  const hasGamesTommorow = await checkGameTomorrow();
+  if (hasGamesTommorow) {
     console.log('Пробую автоматически отправить опрос на игру');
     sendGamePoll(bot, Number(chatId), botName);
   } else {

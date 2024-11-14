@@ -12,7 +12,7 @@ export const checkGameTomorrow = async () => {
     const tomorrow = getTommorowDate();
 
     // Фильтруем игры по завтрашней дате
-    const tomorrowsGames = games.filter(({ GameDateTime }) => {
+    const tomorrowGames = games.filter(({ GameDateTime }) => {
       const gameDateMiliseconds = parseInt(
         GameDateTime.match(/\d+/)?.[0] || '',
         10
@@ -22,9 +22,9 @@ export const checkGameTomorrow = async () => {
       return tomorrow === gameDate;
     });
 
-    return tomorrowsGames;
+    return !!tomorrowGames.length;
   } catch (error) {
     console.error('Ошибка при получении расписания:', error);
-    return [];
+    return false;
   }
 };

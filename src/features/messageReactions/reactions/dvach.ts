@@ -1,10 +1,11 @@
 import TelegramBot from 'node-telegram-bot-api';
+import { getChatId } from '../../../shared/utils/utils';
 
 const dvachChannelId = -1001009232144;
 
 export const activateDvachReaction = (bot: TelegramBot) => {
   bot.on('message', (msg) => {
-    const chatId = msg.chat.id;
+    const chatId = getChatId(msg);
     const isDvachRepost = msg.forward_from_chat?.id === dvachChannelId;
 
     // Проверяем, есть ли ключевое слово "паблик" в сообщении

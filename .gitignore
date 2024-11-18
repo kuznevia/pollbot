@@ -1,5 +1,4 @@
 node_modules
 pollDate.json
 dist
-.env.development
-.env.production
+.env*

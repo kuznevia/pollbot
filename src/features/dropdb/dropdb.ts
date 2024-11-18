@@ -1,36 +1,24 @@
-import TelegramBot from 'node-telegram-bot-api';
-import { state } from '../../shared/state/state';
-import { connectDB } from '../../db/db';
+import { PollBot } from '../../bot';
+import { defaultAppeal } from '../../shared/consts/consts';
+import { getChatId, getSender, isCreator } from '../../shared/utils/utils';
 
-export const startDropDbListener = (bot: TelegramBot) => {
+export const startDropDbListener = (bot: PollBot) => {
   // Команда для дропа бд
   bot.onText(/\/drop/, async (msg) => {
-    const chatId = msg.chat.id;
-    const sender = msg.from?.first_name;
+    const chatId = getChatId(msg);
+    const sender = getSender(msg);
 
-    const { isPolling } = state;
-
-    if (isPolling) {
-      bot.sendMessage(chatId, `${sender}, мразь, я занят, повтори позже`);
-
-      return;
-    }
-
-    const isOwner = sender === 'Viacheslav';
-
-    if (sender && !isOwner) {
+    if (!isCreator(sender)) {
       bot.sendMessage(
         chatId,
-        `${sender}, дропать БД может только хозяин, мразь`
+        `${sender}, дропать БД может только хозяин, ${defaultAppeal}`
       );
-      state.isPolling = false;
 
       return;
     }
 
-    const db = await connectDB();
+    const db = await bot.connectDB();
     await db.dropDatabase();
     bot.sendMessage(chatId, `${sender}, БД дропнута`);
-    state.isPolling = false;
   });
 };

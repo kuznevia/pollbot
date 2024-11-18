@@ -1,10 +1,11 @@
-import TelegramBot from 'node-telegram-bot-api';
+import { PollBot } from '../../bot';
+import { checkMessage } from '../../shared/consts/consts';
+import { getChatId } from '../../shared/utils/utils';
 
-export const startHealthCheckListener = (bot: TelegramBot) => {
+export const startHealthCheckListener = (bot: PollBot) => {
   // Команда для пинания бота
   bot.onText(/\/check/, (msg) => {
-    const chatId = msg.chat.id;
-    const message = 'Ебать свиней';
-    bot.sendMessage(chatId, message);
+    const chatId = getChatId(msg);
+    bot.sendMessage(chatId, checkMessage);
   });
 };

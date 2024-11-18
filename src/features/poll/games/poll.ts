@@ -1,13 +1,16 @@
 import TelegramBot from 'node-telegram-bot-api';
 import { Game } from './model';
-import { state } from '../../../shared/state/state';
 import { Poll } from '../model';
 import {
   isPollForGameCreated,
   saveLastPollToDB,
 } from '../../../shared/utils/date';
-import { connectDB } from '../../../db/db';
 import { findNextGames } from './utils/findNextGame';
+import { PollBotError } from '../../../shared/model/model';
+import { PollBot } from '../../../bot';
+import { defaultAppeal, gamePollMessage } from '../../../shared/consts/consts';
+import { isAdminOrBot, isBot } from '../../../shared/utils/utils';
+import { ROUTES } from '../../../shared/routes/routes';
 
 // Регулярный опрос на игру
 const createGamePoll = (
@@ -34,7 +37,7 @@ const createGamePoll = (
 };
 
 const createPoll = (
-  bot: TelegramBot,
+  bot: PollBot,
   chatId: number,
   game: Game,
   isLastPoll: boolean
@@ -47,7 +50,7 @@ const createPoll = (
     })
     .then(() => {
       if (isLastPoll) {
-        return bot.sendMessage(chatId, 'Время ебать свиней');
+        return bot.sendMessage(chatId, gamePollMessage);
       }
     })
     .catch((err) => {
@@ -58,70 +61,61 @@ const createPoll = (
 };
 
 export const sendGamePoll = async (
-  bot: TelegramBot,
+  bot: PollBot,
   chatId: number,
-  sender?: string
+  sender: string
 ) => {
-  const { isPolling } = state;
+  try {
+    if (!isAdminOrBot(sender)) {
+      bot.sendMessage(
+        chatId,
+        `${sender}, опросы на игры могут создавать только тренер или хозяин, ${defaultAppeal}`
+      );
 
-  if (isPolling) {
-    bot.sendMessage(chatId, `${sender}, мразь, я занят, повтори позже`);
+      return;
+    }
 
-    return;
-  }
+    const db = await bot.connectDB();
+    const pollsCollection = db.collection('polls');
+    const nextGames = await findNextGames();
 
-  state.isPolling = true;
+    if (!nextGames.length) {
+      const message = `${sender}, в расписании нет игр`;
+      await bot.sendMessageOrConsole(chatId, message, {
+        isBotSender: isBot(sender),
+      });
 
-  const isCoachOrOwner =
-    sender === 'Alexey' || sender === 'Viacheslav' || sender === 'Никита';
+      return;
+    }
 
-  if (sender && !isCoachOrOwner) {
-    bot.sendMessage(
-      chatId,
-      `${sender}, опросы на игры могут создавать только тренер или хозяин, мразь`
-    );
-    state.isPolling = false;
-
-    return;
-  }
-
-  const db = await connectDB();
-  const pollsCollection = db.collection('polls');
-  const nextGames = await findNextGames();
-  if (nextGames.length) {
     // Проверка, был ли уже создан опрос на эту игру
     const isCreatedForThatGame = await isPollForGameCreated(
       pollsCollection,
       Poll.game,
       nextGames[0].GameID
     );
-    if (isCreatedForThatGame) {
-      if (sender) {
-        const message = `${sender}, на следующую игру уже есть опрос, мразь`;
-        bot.sendMessage(chatId, message);
-      } else {
-        console.log('Опрос на эту игру уже создан');
-      }
 
-      state.isPolling = false;
+    if (isCreatedForThatGame) {
+      const message = `${sender}, на следующую игру уже есть опрос, ${defaultAppeal}`;
+      await bot.sendMessageOrConsole(chatId, message, {
+        isBotSender: isBot(sender),
+      });
 
       return;
     }
+
+    // Путь к локальному GIF файлу
+    const gifPath = ROUTES.HELLO_JPG;
+    await bot.sendAnimation(chatId, gifPath);
 
     for (const game of nextGames) {
       const isLastPoll = nextGames.indexOf(game) === nextGames.length - 1;
       await createPoll(bot, Number(chatId), game, isLastPoll);
       await saveLastPollToDB(pollsCollection, Poll.game, game.GameID);
-      console.log('Автоматически отправлен опрос об игре');
     }
-  } else {
-    if (sender) {
-      const message = `${sender}, в расписании нет игр`;
-      await bot.sendMessage(chatId, message);
-    } else {
-      console.log('В расписании нет игр');
-    }
+  } catch (err) {
+    const error = err as PollBotError;
+    const errorMessage = error?.response?.body?.description;
+    bot.sendMessage(chatId, `Ошибка, братья, \n${errorMessage}`);
   }
-
-  state.isPolling = false;
 };

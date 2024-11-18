@@ -1,20 +1,26 @@
-import TelegramBot from 'node-telegram-bot-api';
 import cron from 'node-cron';
 import { sendPracticePoll } from './poll';
-import { chatId } from '../../../shared/consts/consts';
+import { botName, chatId } from '../../../shared/consts/consts';
+import { PollBot } from '../../../bot';
+import { getChatId, getSender } from '../../../shared/utils/utils';
 
-export const startPracticePollListener = (bot: TelegramBot) => {
+export const startPracticePollListener = (bot: PollBot) => {
   // Команда для запуска опроса
-  bot.onText(/\/poll/, (msg) => {
-    sendPracticePoll(bot, msg.chat.id, msg.from?.first_name);
+  bot.onText(/\/practice/, async (msg) => {
+    const chatId = getChatId(msg);
+    const sender = getSender(msg);
+
+    await sendPracticePoll(bot, chatId, sender);
   });
 };
 
-export const schedulePracticePoll = (bot: TelegramBot) => {
-  // Периодическое создание опроса по расписанию
-  // В понедельник и четверг в 10:00 мск
-  cron.schedule('0 10 * * 1,4', () => {
-    console.log('Пробую автоматически отправить опрос на тренировку');
-    sendPracticePoll(bot, Number(chatId));
-  });
+const schedulePollEveryMondayAndThursday10AM = (bot: PollBot) => {
+  console.log('Пробую автоматически отправить опрос на тренировку');
+  sendPracticePoll(bot, Number(chatId), botName);
+};
+
+export const schedulePracticePoll = (bot: PollBot) => {
+  cron.schedule('0 10 * * 1,4', () =>
+    schedulePollEveryMondayAndThursday10AM(bot)
+  );
 };

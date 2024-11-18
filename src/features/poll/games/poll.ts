@@ -8,7 +8,11 @@ import {
 import { findNextGames } from './utils/findNextGame';
 import { PollBotError } from '../../../shared/model/model';
 import { PollBot } from '../../../bot';
-import { defaultAppeal, gamePollMessage } from '../../../shared/consts/consts';
+import {
+  defaultAppeal,
+  gamePollMessage,
+  gamePollReady,
+} from '../../../shared/consts/consts';
 import { isAdminOrBot, isBot } from '../../../shared/utils/utils';
 import { ROUTES } from '../../../shared/routes/routes';
 
@@ -20,16 +24,14 @@ const createGamePoll = (
 ) => {
   const {
     DisplayDateTimeMsk,
-    CompTeamNameAen,
-    CompTeamNameBen,
+    ShortTeamNameAen,
+    ShortTeamNameBen,
     LeagueNameRu,
     ArenaRu,
   } = game;
-  const teamA = CompTeamNameAen.slice(0, 12);
-  const teamB = CompTeamNameBen.slice(0, 12);
 
-  const pollQuestion = `${LeagueNameRu}\u000A${DisplayDateTimeMsk}\u000A${teamA} - ${teamB}\u000A${ArenaRu}`;
-  const options = ['Готов ебать', 'Не готов'];
+  const pollQuestion = `${LeagueNameRu}\u000A${DisplayDateTimeMsk} - ${ArenaRu}\u000A${ShortTeamNameAen} - ${ShortTeamNameBen}`;
+  const options = [gamePollReady, 'Не готов'];
 
   return bot.sendPoll(Number(chatId), pollQuestion, options, {
     is_anonymous: false,

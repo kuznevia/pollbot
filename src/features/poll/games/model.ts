@@ -1,8 +1,8 @@
 export interface Game {
   DaysFromToday: number;
   ArenaRu: string;
-  CompTeamNameAen: string;
-  CompTeamNameBen: string;
+  ShortTeamNameAen: string;
+  ShortTeamNameBen: string;
   DisplayDateTimeMsk: string;
   LeagueNameRu: string;
   GameDateTime: string;

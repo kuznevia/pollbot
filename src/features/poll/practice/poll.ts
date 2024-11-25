@@ -64,7 +64,10 @@ export const sendPracticePoll = async (
     await bot.sendAnimation(chatId, gifPath);
     const pollMessage = await createPoll(bot, chatId);
     await bot.pinChatMessage(chatId, pollMessage.message_id);
-    await bot.sendMessage(chatId, sender ? letsGoMessage : outranMessage);
+    await bot.sendMessage(
+      chatId,
+      isBot(sender) ? outranMessage : letsGoMessage
+    );
 
     // Сохраняем дату последнего опроса
     await saveLastPollToDB(pollsCollection, Poll.practice);

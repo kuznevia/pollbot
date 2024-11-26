@@ -15,7 +15,7 @@ export const startGamePollListener = (bot: PollBot) => {
   });
 };
 
-const schedulePollEveryMorning11AM = async (bot: PollBot) => {
+const schedulePollEveryMorning10AM = async (bot: PollBot) => {
   const hasGamesTommorow = await checkGameTomorrow();
   if (hasGamesTommorow) {
     console.log('Пробую автоматически отправить опрос на игру');
@@ -26,5 +26,5 @@ const schedulePollEveryMorning11AM = async (bot: PollBot) => {
 };
 
 export const scheduleGamePoll = (bot: PollBot) => {
-  cron.schedule('0 11 * * *', () => schedulePollEveryMorning11AM(bot));
+  cron.schedule('10 10 * * *', () => schedulePollEveryMorning10AM(bot));
 };

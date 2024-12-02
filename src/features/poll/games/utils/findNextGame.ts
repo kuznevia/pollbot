@@ -27,10 +27,14 @@ export const findNextGames = async () => {
       new Date(getGameDateMilliseconds(futureGames[0].GameDateTime))
     );
 
+    // Вычисляем конечную дату диапазона (ближайшая дата + 2 дня)
+    const endRangeDate = new Date(nextGameDate);
+    endRangeDate.setDate(endRangeDate.getDate() + 2);
+
     // Фильтруем игры на ближайшую дату
     const nextGames = futureGames.filter(({ GameDateTime }) => {
       const gameDate = new Date(getGameDateMilliseconds(GameDateTime));
-      return gameDate.toDateString() === nextGameDate.toDateString();
+      return gameDate >= nextGameDate && gameDate <= endRangeDate;
     });
 
     return nextGames;

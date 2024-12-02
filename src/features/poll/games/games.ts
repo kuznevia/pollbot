@@ -5,6 +5,8 @@ import { checkGameTomorrow } from './utils/checkGameTommorow';
 import { PollBot } from '../../../bot';
 import { getChatId, getSender } from '../../../shared/utils/utils';
 
+const EVERY_MORNING_10_10_AM = '10 10 * * *';
+
 export const startGamePollListener = (bot: PollBot) => {
   // Команда для запуска опроса
   bot.onText(/\/game/, async (msg) => {
@@ -15,7 +17,7 @@ export const startGamePollListener = (bot: PollBot) => {
   });
 };
 
-const schedulePollEveryMorning10AM = async (bot: PollBot) => {
+const schedulePoll = async (bot: PollBot) => {
   const hasGamesTommorow = await checkGameTomorrow();
   if (hasGamesTommorow) {
     console.log('Пробую автоматически отправить опрос на игру');
@@ -26,5 +28,5 @@ const schedulePollEveryMorning10AM = async (bot: PollBot) => {
 };
 
 export const scheduleGamePoll = (bot: PollBot) => {
-  cron.schedule('10 10 * * *', () => schedulePollEveryMorning10AM(bot));
+  cron.schedule(EVERY_MORNING_10_10_AM, () => schedulePoll(bot));
 };

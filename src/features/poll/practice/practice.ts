@@ -4,6 +4,8 @@ import { botName, chatId } from '../../../shared/consts/consts';
 import { PollBot } from '../../../bot';
 import { getChatId, getSender } from '../../../shared/utils/utils';
 
+const EVERY_MONDAY_AND_TUESDAY_10_00_AM = '0 10 * * 1,4';
+
 export const startPracticePollListener = (bot: PollBot) => {
   // Команда для запуска опроса
   bot.onText(/\/practice/, async (msg) => {
@@ -14,13 +16,11 @@ export const startPracticePollListener = (bot: PollBot) => {
   });
 };
 
-const schedulePollEveryMondayAndThursday10AM = (bot: PollBot) => {
+const schedulePoll = (bot: PollBot) => {
   console.log('Пробую автоматически отправить опрос на тренировку');
   sendPracticePoll(bot, Number(chatId), botName);
 };
 
 export const schedulePracticePoll = (bot: PollBot) => {
-  cron.schedule('0 10 * * 1,4', () =>
-    schedulePollEveryMondayAndThursday10AM(bot)
-  );
+  cron.schedule(EVERY_MONDAY_AND_TUESDAY_10_00_AM, () => schedulePoll(bot));
 };

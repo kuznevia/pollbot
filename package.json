@@ -3,7 +3,7 @@
   "version": "2.1.0",
   "main": "pollbot.js",
   "scripts": {
-    "start": "cross-env NODE_ENV=production node ./dist/pollbot.js",
+    "start": "cross-env NODE_ENV=production NODE_EXTRA_CA_CERTS=./assets/certs/certs.pem node ./dist/pollbot.js",
     "pm:build": "npm ci && npm run build",
     "pm:start": "pm2 start npm --name pollbot --time -- start",
     "pm:save": "pm2 save",
@@ -11,7 +11,7 @@
     "pm:restart": "pm2 restart pollbot",
     "pm:stop": "pm2 stop all",
     "pm:delete": "pm2 delete all",
-    "dev": "cross-env NODE_ENV=development nodemon",
+    "dev": "cross-env NODE_EXTRA_CA_CERTS=./assets/certs/certs.pem NODE_ENV=development nodemon",
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint src/**/*.ts",

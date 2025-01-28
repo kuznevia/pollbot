@@ -1,5 +1,6 @@
 export interface AuthResponse {
   access_token: string;
+  expires_at: number;
 }
 
 export interface GigaChatChoices {

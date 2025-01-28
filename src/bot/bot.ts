@@ -6,8 +6,10 @@ import { BotScheduler } from './plugins/scheduledActions';
 import { BotState, PollBotMessageOptions } from './model';
 import { defaultAppeal } from '../shared/consts/consts';
 import { getChatId, getSender } from '../shared/utils/utils';
+import { AI } from './AI/AI';
 export class PollBot extends TelegramBot {
   db: DB;
+  AI: AI;
   listener: BotListeners;
   scheduler: BotScheduler;
   state = BotState.IDLE;
@@ -15,6 +17,7 @@ export class PollBot extends TelegramBot {
   constructor(token: string, options?: TelegramBot.ConstructorOptions) {
     super(token, options);
     this.db = new DB();
+    this.AI = new AI();
     this.listener = new BotListeners();
     this.scheduler = new BotScheduler();
     this.db.connect();

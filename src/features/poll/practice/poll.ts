@@ -1,4 +1,5 @@
 import TelegramBot from 'node-telegram-bot-api';
+import { AxiosError } from 'axios';
 import { ROUTES } from '../../../shared/routes/routes';
 import {
   isMondayOrThursday,
@@ -10,15 +11,50 @@ import { PollBotError } from '../../../shared/model/model';
 import { PollBot } from '../../../bot';
 import {
   defaultAppeal,
+  gigaChatModel,
+  gigaChatPollMessage,
   letsGoMessage,
   outranMessage,
 } from '../../../shared/consts/consts';
 import { isBot } from '../../../shared/utils/utils';
+import { defaultPollMessage, defaultPollOptions } from './const';
+
+//Запрос оригинальных текстовок опросов через GigaChat
+const getAIPollData = async (bot: PollBot) => {
+  try {
+    const gigaChatResponse = await bot.AI.sendMessage(
+      gigaChatPollMessage,
+      gigaChatModel
+    );
+
+    const content = gigaChatResponse.data.choices[0].message.content;
+    const jsonMatch = content.match(/```json\n([\s\S]*?)```/);
+
+    if (jsonMatch) {
+      const parsedJson = JSON.parse(jsonMatch[1]);
+      const AIPollQuestion = parsedJson?.question || defaultPollMessage;
+
+      const AIoptions =
+        parsedJson?.yes && parsedJson?.no && parsedJson?.dunno
+          ? [parsedJson.yes, parsedJson.no, parsedJson.dunno]
+          : defaultPollOptions;
+
+      return { AIPollQuestion, AIoptions };
+    }
+
+    return { AIPollQuestion: null, AIoptions: null };
+  } catch (err) {
+    const error = err as AxiosError;
+    console.error(error.response ? error.response.data : error.message);
+    return { AIPollQuestion: null, AIoptions: null };
+  }
+};
 
 // Регулярный опрос на тренировку
-const createPoll = (bot: PollBot, chatId: TelegramBot.ChatId) => {
-  const pollQuestion = 'Тренировка в 22:00';
-  const options = ['Да', 'Нет', 'Не знаю'];
+const createPoll = async (bot: PollBot, chatId: TelegramBot.ChatId) => {
+  const { AIPollQuestion, AIoptions } = await getAIPollData(bot);
+  const pollQuestion = AIPollQuestion || defaultPollMessage;
+  const options = AIoptions || defaultPollOptions;
 
   return bot.sendPoll(chatId, pollQuestion, options, {
     is_anonymous: false,

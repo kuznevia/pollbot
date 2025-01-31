@@ -8,7 +8,7 @@ const EVERY_MONDAY_AND_TUESDAY_10_00_AM = '0 10 * * 1,4';
 
 export const startPracticePollListener = (bot: PollBot) => {
   // Команда для запуска опроса
-  bot.onText(/\/practice/, async (msg) => {
+  bot.onText(/\/practicepoll/, async (msg) => {
     const chatId = getChatId(msg);
     const sender = getSender(msg);
 

@@ -9,7 +9,7 @@ const EVERY_MORNING_10_10_AM = '10 10 * * *';
 
 export const startGamePollListener = (bot: PollBot) => {
   // Команда для запуска опроса
-  bot.onText(/\/game/, async (msg) => {
+  bot.onText(/\/gamepoll/, async (msg) => {
     const chatId = getChatId(msg);
     const sender = getSender(msg);
 

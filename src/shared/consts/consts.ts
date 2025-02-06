@@ -18,4 +18,7 @@ export const mongoURI = envConfig.get('MONGO_URI');
 
 export const gigaToken = envConfig.get('GIGA_CHAT_KEY');
 export const gigaChatModel = envConfig.get('GIGA_CHAT_MODEL');
+
 export const gigaChatPollMessage = envConfig.get('GIGA_CHAT_POLLMESSAGE');
+
+export const lazyMember = envConfig.get('LAZY_MEMBER');

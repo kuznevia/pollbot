@@ -19,12 +19,22 @@ export const getUsersTopic = async (
       },
     });
 
+    const timeOutId = setTimeout(() => {
+      bot.removeListener('callback_query', onCallbackQuery);
+      bot.sendMessage(
+        chatId,
+        `${sender}, долго думал, отправляю дефолтный опрос`
+      );
+      resolve(null);
+    }, 10000);
+
     const onCallbackQuery = (query: TelegramBot.CallbackQuery) => {
       if (query.message?.chat.id !== chatId) return;
 
       if (query.from?.first_name !== sender) return;
 
       const answer = query.data;
+      clearTimeout(timeOutId);
       bot.removeListener('callback_query', onCallbackQuery);
 
       if (answer === 'yes') {
@@ -33,10 +43,21 @@ export const getUsersTopic = async (
           'Напишите сообщение, которое бот будет использовать в качестве темы для шутки. Можно несколько тем через запятую. У тебя 30 секунд'
         );
 
+        const timeOutId = setTimeout(() => {
+          bot.removeListener('message', onMessage);
+          bot.sendMessage(
+            chatId,
+            `${sender}, время на ввод темы истекло, отправляю дефолтный опрос`
+          );
+          resolve(null);
+        }, 30000);
+
         const onMessage = (msg: TelegramBot.Message) => {
           if (msg.chat.id !== chatId) return;
 
           if (msg.from?.first_name !== sender) return;
+
+          clearTimeout(timeOutId);
 
           const themes = msg.text;
 
@@ -52,12 +73,6 @@ export const getUsersTopic = async (
         };
 
         bot.on('message', onMessage);
-
-        setTimeout(() => {
-          bot.removeListener('message', onMessage);
-          bot.sendMessage(chatId, `${sender}, время на ввод темы истекло.`);
-          resolve(null);
-        }, 30000);
       } else if (answer === 'no') {
         bot.sendMessage(chatId, `${sender}, ${lazyMember}`);
         resolve(null);

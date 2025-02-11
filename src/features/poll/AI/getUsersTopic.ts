@@ -8,7 +8,7 @@ export const getUsersTopic = async (
   sender: string
 ) => {
   return new Promise<string | null>((resolve) => {
-    bot.sendMessage(chatId, `${sender}, Хотите задать тему сами?`, {
+    bot.sendMessage(chatId, `${sender}, хочешь задать тему сам?`, {
       reply_markup: {
         inline_keyboard: [
           [
@@ -40,7 +40,7 @@ export const getUsersTopic = async (
       if (answer === 'yes') {
         bot.sendMessage(
           chatId,
-          'Напишите сообщение, которое бот будет использовать в качестве темы для шутки. Можно несколько тем через запятую. У тебя 30 секунд'
+          'Напиши сообщение, которое бот будет использовать в качестве темы для шутки. Можно несколько тем через запятую. У тебя 30 секунд'
         );
 
         const timeOutId = setTimeout(() => {

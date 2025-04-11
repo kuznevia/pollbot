@@ -41,7 +41,7 @@ export class BotListeners {
   addAllListeners() {
     this.addPracticePollListener();
     this.addGamePollListener();
-    this.addMessageReactionsListener();
+    // this.addMessageReactionsListener(); отключил реакции на двач
     this.addHealthCheckListener();
     this.addDropDbListener();
     this.addChatIdListener();

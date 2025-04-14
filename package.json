@@ -4,6 +4,7 @@
   "main": "pollbot.js",
   "scripts": {
     "start": "cross-env NODE_ENV=production NODE_EXTRA_CA_CERTS=./assets/certs/certs.pem node ./dist/pollbot.js",
+    "ssh": "ssh root@80.78.243.47",
     "pm:build": "npm ci && npm run build",
     "pm:start": "pm2 start npm --name pollbot --time -- start",
     "pm:save": "pm2 save",

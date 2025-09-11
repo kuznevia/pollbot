@@ -1,7 +1,7 @@
 import TelegramBot from 'node-telegram-bot-api';
 import { ROUTES } from '../../../shared/routes/routes';
 import {
-  isMondayOrTuesdayOrThursday,
+  isMondayOrThursday,
   isPollCreatedToday,
   saveLastPollToDB,
 } from '../../../shared/utils/date';
@@ -10,15 +10,13 @@ import { PollBotError } from '../../../shared/model/model';
 import { PollBot } from '../../../bot';
 import {
   defaultAppeal,
-  gigaChatPollMessage_1,
-  gigaChatPollMessage_2,
+  gigaChatPollMessage,
   letsGoMessage,
   outranMessage,
 } from '../../../shared/consts/consts';
 import { isBot } from '../../../shared/utils/utils';
-import { defaultPollOptions } from './const';
+import { defaultPollMessage, defaultPollOptions } from './const';
 import { getAIPollData, getUsersTopic } from '../AI';
-import { getDefaultPollMessage, getPollMessage } from './utils';
 
 // Регулярный опрос на тренировку
 const createPoll = async (
@@ -27,18 +25,13 @@ const createPoll = async (
   sender: string
 ) => {
   if (isBot(sender)) {
-    return bot.sendPoll(chatId, getDefaultPollMessage(), defaultPollOptions, {
+    return bot.sendPoll(chatId, defaultPollMessage, defaultPollOptions, {
       is_anonymous: false,
     });
   }
 
   const userTopic = await getUsersTopic(bot, chatId, sender);
-  const pollMessage = userTopic
-    ? gigaChatPollMessage_1 +
-      getPollMessage() +
-      gigaChatPollMessage_2 +
-      userTopic
-    : userTopic;
+  const pollMessage = userTopic ? gigaChatPollMessage + userTopic : userTopic;
 
   const { AIPollQuestion, AIoptions } = await getAIPollData(
     bot,
@@ -46,7 +39,7 @@ const createPoll = async (
     sender,
     pollMessage
   );
-  const pollQuestion = AIPollQuestion || getDefaultPollMessage();
+  const pollQuestion = AIPollQuestion || defaultPollMessage;
   const options = AIoptions || defaultPollOptions;
 
   return bot.sendPoll(chatId, pollQuestion, options, {
@@ -64,10 +57,10 @@ export const sendPracticePoll = async (
 
   try {
     // Проверяем, является ли сегодня понедельником или четвергом
-    if (!isMondayOrTuesdayOrThursday()) {
+    if (!isMondayOrThursday()) {
       bot.sendMessage(
         chatId,
-        `${sender}, опросы можно создавать только по понедельникам, вторникам и четвергам, ${defaultAppeal}`
+        `${sender}, опросы можно создавать только по понедельникам и четвергам, ${defaultAppeal}`
       );
 
       return;

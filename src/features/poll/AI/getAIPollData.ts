@@ -1,7 +1,7 @@
 import { AxiosError } from 'axios';
 import TelegramBot from 'node-telegram-bot-api';
 import { PollBot } from '../../../bot';
-import { gigaChatModel } from '../../../shared/consts/consts';
+import { geminiModel } from '../../../shared/consts/consts';
 import { isBot } from '../../../shared/utils/utils';
 import { defaultPollMessage, defaultPollOptions } from '../practice/const';
 
@@ -17,12 +17,8 @@ export const getAIPollData = async (
       return { AIPollQuestion: null, AIoptions: null };
     }
 
-    const gigaChatResponse = await bot.AI.sendMessage(
-      pollMessage,
-      gigaChatModel
-    );
+    const content = await bot.AI.sendMessage(pollMessage, geminiModel);
 
-    const content = gigaChatResponse.data.choices[0].message.content;
     const jsonMatch = content.match(/```json\n([\s\S]*?)```/);
 
     if (jsonMatch) {

@@ -1,8 +1,9 @@
 import axios from 'axios';
-import { gigaToken } from '../../shared/consts/consts';
-import { AuthResponse, GigaChatResponse } from './model';
+import { gigaToken } from '../../../shared/consts/consts';
+import { AuthResponse, GigaChatResponse } from '../model';
+import { AI } from '../factory';
 
-export class AI {
+export class GigaChat extends AI {
   authUrl = 'https://ngw.devices.sberbank.ru:9443/api/v2/oauth';
   sendMessageUrl =
     'https://gigachat.devices.sberbank.ru/api/v1/chat/completions';
@@ -46,7 +47,7 @@ export class AI {
     }
   }
 
-  async sendMessage(content: string, model: string) {
+  async sendMessage(content: string, model: string): Promise<string> {
     try {
       if (!this.accessToken) {
         await this._auth();
@@ -58,7 +59,7 @@ export class AI {
           {
             role: 'system',
             content,
-          }, // Твое задание или вопрос
+          },
         ],
         stream: false,
         update_interval: 0,
@@ -76,7 +77,8 @@ export class AI {
         data: messageData,
       };
 
-      return await axios<GigaChatResponse>(config);
+      const response = await axios<GigaChatResponse>(config);
+      return response.data.choices[0].message.content;
     } catch (error) {
       console.error('Message sending failed:', error);
       throw new Error('Unable to send message to GigaChat API.');

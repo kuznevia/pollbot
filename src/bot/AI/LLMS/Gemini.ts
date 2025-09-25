@@ -1,7 +1,7 @@
 import { GoogleGenAI } from '@google/genai';
-import { AI } from '../factory';
+import { LLMProvider } from '../model';
 
-export class GeminiChat extends AI {
+export class GeminiProvider implements LLMProvider {
   authUrl = 'https://gemini.example.com/api/v1/auth';
   sendMessageUrl = 'https://gemini.example.com/api/v1/chat';
   accessToken: string | null = null;

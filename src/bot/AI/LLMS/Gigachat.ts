@@ -1,9 +1,8 @@
 import axios from 'axios';
 import { gigaToken } from '../../../shared/consts/consts';
-import { AuthResponse, GigaChatResponse } from '../model';
-import { AI } from '../factory';
+import { AuthResponse, GigaChatResponse, LLMProvider } from '../model';
 
-export class GigaChat extends AI {
+export class GigaChatProvider implements LLMProvider {
   authUrl = 'https://ngw.devices.sberbank.ru:9443/api/v2/oauth';
   sendMessageUrl =
     'https://gigachat.devices.sberbank.ru/api/v1/chat/completions';

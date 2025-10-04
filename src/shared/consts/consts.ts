@@ -24,3 +24,5 @@ export const geminiModel = envConfig.get('GEMINI_MODEL');
 export const gigaChatPollMessage = envConfig.get('GIGA_CHAT_POLLMESSAGE');
 
 export const lazyMember = envConfig.get('LAZY_MEMBER');
+
+export const currentLLMModel = envConfig.get('CURRENT_LLM_MODEL');

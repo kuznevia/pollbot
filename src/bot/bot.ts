@@ -4,21 +4,24 @@ import { commands } from './commands';
 import { BotListeners } from './plugins/listeners';
 import { BotScheduler } from './plugins/scheduledActions';
 import { BotState, PollBotMessageOptions } from './model';
-import { defaultAppeal } from '../shared/consts/consts';
+import { defaultAppeal, currentLLMModel } from '../shared/consts/consts';
 import { getChatId, getSender } from '../shared/utils/utils';
-import { GeminiChat } from './AI';
+import { LLMFactory } from './AI/factory';
+import { LLMModelType, LLMProvider } from './AI/model';
 
 export class PollBot extends TelegramBot {
   db: DB;
-  AI: GeminiChat;
+  AI: LLMProvider;
   listener: BotListeners;
   scheduler: BotScheduler;
   state = BotState.IDLE;
+  LLMFactory: LLMFactory;
 
   constructor(token: string, options?: TelegramBot.ConstructorOptions) {
     super(token, options);
     this.db = new DB();
-    this.AI = new GeminiChat();
+    this.LLMFactory = new LLMFactory(currentLLMModel as LLMModelType);
+    this.AI = this.LLMFactory.getProvider();
     this.listener = new BotListeners();
     this.scheduler = new BotScheduler();
     this.db.connect();

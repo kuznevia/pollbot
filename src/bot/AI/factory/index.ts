@@ -1,13 +1,36 @@
-export abstract class AI {
-  abstract sendMessage(content: string, model: string): Promise<string>;
+import { GeminiProvider } from '../LLMS/Gemini';
+import { GigaChatProvider } from '../LLMS/Gigachat';
+import { LLMModelType, LLMProvider } from '../model';
 
-  protected _checkImplementation() {
-    if (typeof this.sendMessage !== 'function') {
-      throw new Error('Class must implement sendMessage method');
-    }
+export class LLMFactory {
+  private providers: Map<LLMModelType, LLMProvider> = new Map();
+  private currentModel: LLMModelType;
+
+  constructor(defaultModel: LLMModelType = LLMModelType.GEMINI) {
+    this.providers.set(LLMModelType.GEMINI, new GeminiProvider());
+    this.providers.set(LLMModelType.GIGACHAT, new GigaChatProvider());
+    this.currentModel = defaultModel;
   }
 
-  constructor() {
-    this._checkImplementation();
+  getProvider(modelType?: LLMModelType): LLMProvider {
+    const type = modelType || this.currentModel;
+    const provider = this.providers.get(type);
+
+    if (!provider) {
+      throw new Error(`Provider for ${type} not found`);
+    }
+
+    return provider;
+  }
+
+  switchModel(modelType: LLMModelType): void {
+    if (!this.providers.has(modelType)) {
+      throw new Error(`Model ${modelType} is not supported`);
+    }
+    this.currentModel = modelType;
+  }
+
+  getCurrentModel(): LLMModelType {
+    return this.currentModel;
   }
 }

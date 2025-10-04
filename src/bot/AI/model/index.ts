@@ -3,6 +3,15 @@ export interface AuthResponse {
   expires_at: number;
 }
 
+export interface LLMProvider {
+  sendMessage(content: string, model: string): Promise<string>;
+}
+
+export enum LLMModelType {
+  GEMINI = 'gemini',
+  GIGACHAT = 'gigachat',
+}
+
 export interface GigaChatChoices {
   message: {
     role: string;

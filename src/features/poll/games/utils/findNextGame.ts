@@ -1,12 +1,13 @@
 import axios from 'axios';
 import { GamesResponse } from '../model';
 import { getGameDateMilliseconds } from '../../../../shared/utils/date';
+import { competitionID } from '../../../../shared/consts/consts';
 
 // Преобразуем строки в объекты Date и находим ближайшую к текущей дате
 export const findNextGames = async () => {
   try {
     const response = await axios.get(
-      'https://reg.infobasket.su/Widget/TeamGames/23698?compId=88649&format=json'
+      `https://reg.infobasket.su/Widget/TeamGames/23698?compId=${competitionID}&format=json`
     );
     const games = response.data as GamesResponse;
 

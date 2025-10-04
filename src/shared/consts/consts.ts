@@ -26,3 +26,5 @@ export const gigaChatPollMessage = envConfig.get('GIGA_CHAT_POLLMESSAGE');
 export const lazyMember = envConfig.get('LAZY_MEMBER');
 
 export const currentLLMModel = envConfig.get('CURRENT_LLM_MODEL');
+
+export const competitionID = envConfig.get('COMP_ID');

@@ -28,3 +28,7 @@ export const lazyMember = envConfig.get('LAZY_MEMBER');
 export const currentLLMModel = envConfig.get('CURRENT_LLM_MODEL');
 
 export const competitionID = envConfig.get('COMP_ID');
+
+export const practiceSchedule = envConfig.get('PRACTICE_SCHEDULE');
+
+export const gamesSchedule = envConfig.get('GAMES_SCHEDULE');

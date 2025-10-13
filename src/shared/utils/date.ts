@@ -1,5 +1,14 @@
 import { Collection } from 'mongodb';
+import { toZonedTime, format } from 'date-fns-tz';
 import { Poll } from '../../features/poll/model';
+
+const timeZone = 'Europe/Moscow';
+
+export const getMoscowDate = () => {
+  const now = new Date();
+
+  return toZonedTime(now, timeZone);
+};
 
 //Парсинг даты из апи невки, для получения чистых милисекунд
 export const getGameDateMilliseconds = (date: string) =>
@@ -7,24 +16,25 @@ export const getGameDateMilliseconds = (date: string) =>
 
 // Функция для получения сегодняшней даты в формате YYYY-MM-DD
 export function getTodayDate() {
-  const today = new Date();
-  return today.toISOString().split('T')[0];
+  const today = getMoscowDate();
+  return format(today, 'yyyy-MM-dd', { timeZone });
 }
 
 export function getTommorowDate() {
-  const tomorrow = new Date();
+  const tomorrow = getMoscowDate();
   tomorrow.setDate(tomorrow.getDate() + 1);
-  return tomorrow.toISOString().split('T')[0];
+  return format(tomorrow, 'yyyy-MM-dd', { timeZone });
 }
 
 // Функция для получения даты в формате YYYY-MM-DD
 export function getDate(date: Date) {
-  return date.toISOString().split('T')[0];
+  return format(toZonedTime(date, timeZone), 'yyyy-MM-dd', { timeZone });
 }
 
 // Функция для проверки, является ли сегодня понедельником или четвергом
 export function isMondayOrThursday() {
-  const today = new Date();
+  const today = getMoscowDate();
+
   const dayOfWeek = today.getDay(); // Получаем день недели (0 - воскресенье, 1 - понедельник, ..., 6 - суббота)
   return dayOfWeek === 1 || dayOfWeek === 4; // Возвращаем true, если понедельник или четверг
 }
@@ -37,7 +47,7 @@ export async function saveLastPollToDB(
 ) {
   const pollRecord = {
     type: pollType,
-    date: new Date(),
+    date: getMoscowDate(),
     id,
   };
   await collection.insertOne(pollRecord);
@@ -48,7 +58,7 @@ export async function isPollCreatedToday(
   collection: Collection,
   pollType: Poll
 ) {
-  const today = new Date();
+  const today = getMoscowDate();
   today.setHours(0, 0, 0, 0); // Установить время в 00:00
 
   const poll = await collection.findOne({
@@ -64,7 +74,7 @@ export async function isPollForGameCreated(
   pollType: Poll,
   id: number
 ) {
-  const today = new Date();
+  const today = getMoscowDate();
   today.setHours(0, 0, 0, 0); // Установить время в 00:00
 
   const poll = await collection.findOne({

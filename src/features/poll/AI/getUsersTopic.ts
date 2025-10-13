@@ -26,7 +26,7 @@ export const getUsersTopic = async (
         `${sender}, долго думал, отправляю дефолтный опрос`
       );
       resolve(null);
-    }, 10000);
+    }, 20000);
 
     const onCallbackQuery = (query: TelegramBot.CallbackQuery) => {
       if (query.message?.chat.id !== chatId) return;
@@ -50,7 +50,7 @@ export const getUsersTopic = async (
             `${sender}, время на ввод темы истекло, отправляю дефолтный опрос`
           );
           resolve(null);
-        }, 30000);
+        }, 60000);
 
         const onMessage = (msg: TelegramBot.Message) => {
           if (msg.chat.id !== chatId) return;

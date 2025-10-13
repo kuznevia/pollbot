@@ -1,6 +1,9 @@
 import axios from 'axios';
 import { GamesResponse } from '../model';
-import { getGameDateMilliseconds } from '../../../../shared/utils/date';
+import {
+  getGameDateMilliseconds,
+  getMoscowDate,
+} from '../../../../shared/utils/date';
 import { competitionID } from '../../../../shared/consts/consts';
 
 // Преобразуем строки в объекты Date и находим ближайшую к текущей дате
@@ -11,7 +14,7 @@ export const findNextGames = async () => {
     );
     const games = response.data as GamesResponse;
 
-    const now = new Date();
+    const now = getMoscowDate();
 
     // Фильтруем игры, оставляя только будущие
     const futureGames = games.filter(

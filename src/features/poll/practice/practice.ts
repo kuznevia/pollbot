@@ -1,10 +1,12 @@
 import cron from 'node-cron';
 import { sendPracticePoll } from './poll';
-import { botName, chatId } from '../../../shared/consts/consts';
+import {
+  botName,
+  chatId,
+  practiceSchedule,
+} from '../../../shared/consts/consts';
 import { PollBot } from '../../../bot';
 import { getChatId, getSender } from '../../../shared/utils/utils';
-
-const EVERY_MONDAY_TUESDAY_THURSDAY_10_00_AM = '0 10 * * 1,2,4';
 
 export const startPracticePollListener = (bot: PollBot) => {
   // Команда для запуска опроса
@@ -22,7 +24,5 @@ const schedulePoll = (bot: PollBot) => {
 };
 
 export const schedulePracticePoll = (bot: PollBot) => {
-  cron.schedule(EVERY_MONDAY_TUESDAY_THURSDAY_10_00_AM, () =>
-    schedulePoll(bot)
-  );
+  cron.schedule(practiceSchedule, () => schedulePoll(bot));
 };

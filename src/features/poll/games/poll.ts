@@ -78,7 +78,7 @@ export const sendGamePoll = async (
     }
 
     const db = await bot.connectDB();
-    const pollsCollection = db.collection('polls');
+    const pollsCollection = db.collection('games');
     const nextGames = await findNextGames();
 
     if (!nextGames.length) {

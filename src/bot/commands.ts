@@ -3,4 +3,5 @@ export const commands = [
   { command: '/gamepoll', description: 'Запустить опрос на игру' },
   { command: '/check', description: 'Проверка связи' },
   { command: '/drop', description: 'Дропнуть БД' },
+  { command: '/summary', description: 'Доложить обстановку' },
 ];

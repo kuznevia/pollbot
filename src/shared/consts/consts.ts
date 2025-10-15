@@ -32,3 +32,5 @@ export const competitionID = envConfig.get('COMP_ID');
 export const practiceSchedule = envConfig.get('PRACTICE_SCHEDULE');
 
 export const gamesSchedule = envConfig.get('GAMES_SCHEDULE');
+
+export const floodChatId = envConfig.get('FLOOD_CHAT_ID');

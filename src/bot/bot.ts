@@ -8,6 +8,7 @@ import { defaultAppeal, currentLLMModel } from '../shared/consts/consts';
 import { getChatId, getSender } from '../shared/utils/utils';
 import { LLMFactory } from './AI/factory';
 import { LLMModelType, LLMProvider } from './AI/model';
+import { BotServices } from './services';
 
 export class PollBot extends TelegramBot {
   db: DB;
@@ -15,22 +16,23 @@ export class PollBot extends TelegramBot {
   listener: BotListeners;
   scheduler: BotScheduler;
   state = BotState.IDLE;
-  LLMFactory: LLMFactory;
+  services: BotServices;
 
   constructor(token: string, options?: TelegramBot.ConstructorOptions) {
     super(token, options);
     this.db = new DB();
-    this.LLMFactory = new LLMFactory(currentLLMModel as LLMModelType);
-    this.AI = this.LLMFactory.getProvider();
+    this.AI = new LLMFactory(currentLLMModel as LLMModelType).getProvider();
     this.listener = new BotListeners();
     this.scheduler = new BotScheduler();
-    this.db.connect();
+    this.services = new BotServices(this);
   }
 
-  init() {
+  async init() {
+    await this.db.connect();
     this.setMyCommands(commands);
     this.listener.startListening(this);
     this.scheduler.schedule(this);
+    this.services.init();
   }
 
   getState() {

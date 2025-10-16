@@ -2,12 +2,20 @@ import { getChatId } from '../../../shared/utils/utils';
 import { Summary } from './model';
 import { PollBot } from '../../bot';
 import { getMoscowDate } from '../../../shared/utils/date';
-import { floodChatId, geminiModel } from '../../../shared/consts/consts';
-import { DAY_IN_SECONDS } from '../../../shared/consts/date';
+import {
+  defaultAppeal,
+  floodChatId,
+  geminiModel,
+} from '../../../shared/consts/consts';
+import {
+  DAY_IN_SECONDS,
+  HOUR_IN_MILLISECONDS,
+} from '../../../shared/consts/date';
 
 export class SummaryService implements Summary {
   bot: PollBot;
   usersMap = new Map<string, string>();
+  private lastSummaryCall = new Map<number, number>();
   private errorHandler?: (
     fn: () => Promise<void>,
     config?: { context: string; chatId: number }
@@ -73,6 +81,7 @@ export class SummaryService implements Summary {
 
   private async handleSummaryCommand(msg: any) {
     const chatId = getChatId(msg);
+
     const db = await this.bot.connectDB();
 
     const summaries = await db.collection('summary').find({ chatId }).toArray();
@@ -84,6 +93,22 @@ export class SummaryService implements Summary {
       );
       return;
     }
+
+    const now = Date.now();
+    const lastCall = this.lastSummaryCall.get(chatId);
+
+    if (lastCall && now - lastCall < HOUR_IN_MILLISECONDS) {
+      const minutesLeft = Math.ceil(
+        (HOUR_IN_MILLISECONDS - (now - lastCall)) / 60000
+      );
+      await this.bot.sendMessage(
+        chatId,
+        `⌛ Команду /summary можно использовать не чаще одного раза в час, ${defaultAppeal}\nПопробуй снова через ${minutesLeft} мин.`
+      );
+      return;
+    }
+
+    this.lastSummaryCall.set(chatId, now);
 
     const dialog = summaries
       .map((s) => `${this.decryptUser(s.user)}: ${s.text.trim()}`)

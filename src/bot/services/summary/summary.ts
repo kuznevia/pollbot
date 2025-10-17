@@ -14,7 +14,8 @@ import {
 
 export class SummaryService implements Summary {
   bot: PollBot;
-  usersMap = new Map<string, string>();
+  private realToMasked = new Map<string, string>();
+  private maskedToReal = new Map<string, string>();
   private lastSummaryCall = new Map<number, number>();
   private errorHandler?: (
     fn: () => Promise<void>,
@@ -147,21 +148,17 @@ export class SummaryService implements Summary {
   }
 
   private encryptUser(user: string) {
-    const encryptedUserName = this.usersMap.get(user);
+    const existing = this.realToMasked.get(user);
+    if (existing) return existing;
 
-    if (!encryptedUserName) {
-      const encryptedUserName = `username${Math.random()}`;
-      this.usersMap.set(encryptedUserName, user);
-      return encryptedUserName;
-    }
-
-    return encryptedUserName;
+    const masked = `username${Math.random().toString(36).slice(2, 8)}`;
+    this.realToMasked.set(user, masked);
+    this.maskedToReal.set(masked, user);
+    return masked;
   }
 
-  private decryptUser(user: string) {
-    const decryptedUser = this.usersMap.get(user);
-
-    return decryptedUser || user;
+  private decryptUser(masked: string) {
+    return this.maskedToReal.get(masked) || masked;
   }
 
   private async collectMessage({

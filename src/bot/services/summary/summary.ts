@@ -1,3 +1,4 @@
+import TelegramBot from 'node-telegram-bot-api';
 import { getChatId } from '../../../shared/utils/utils';
 import { Summary } from './model';
 import { PollBot } from '../../bot';
@@ -63,9 +64,10 @@ export class SummaryService implements Summary {
     );
   }
 
-  private async handleMessage(msg: any) {
+  private async handleMessage(msg: TelegramBot.Message) {
     const chatId = getChatId(msg);
-    const user = msg.from?.username;
+    const user =
+      msg.from?.username || msg.from?.first_name || msg.from?.last_name;
     const text = msg.text;
 
     if (
@@ -80,7 +82,7 @@ export class SummaryService implements Summary {
     await this.collectMessage({ user, text, chatId });
   }
 
-  private async handleSummaryCommand(msg: any) {
+  private async handleSummaryCommand(msg: TelegramBot.Message) {
     const chatId = getChatId(msg);
 
     const db = await this.bot.connectDB();

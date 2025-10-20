@@ -111,8 +111,6 @@ export class SummaryService implements Summary {
       return;
     }
 
-    this.lastSummaryCall.set(chatId, now);
-
     const dialog = summaries
       .map((s) => `${this.decryptUser(s.user)}: ${s.text.trim()}`)
       .join('\n');
@@ -125,7 +123,22 @@ export class SummaryService implements Summary {
     );
     const response = await this.bot.AI.sendMessage(prompt, geminiModel);
 
-    await this.bot.sendMessage(chatId, response);
+    await this.sendLongMessage(chatId, response);
+
+    this.lastSummaryCall.set(chatId, now);
+  }
+
+  private async sendLongMessage(chatId: number, text: string) {
+    const MAX_LENGTH = 4000;
+
+    const chunks = [];
+    for (let i = 0; i < text.length; i += MAX_LENGTH) {
+      chunks.push(text.slice(i, i + MAX_LENGTH));
+    }
+
+    for (const chunk of chunks) {
+      await this.bot.sendMessage(chatId, chunk);
+    }
   }
 
   private buildPrompt(dialog: string): string {

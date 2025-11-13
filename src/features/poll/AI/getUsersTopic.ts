@@ -40,7 +40,7 @@ export const getUsersTopic = async (
       if (answer === 'yes') {
         bot.sendMessage(
           chatId,
-          'Напиши сообщение, которое бот будет использовать в качестве темы для шутки. Можно несколько тем через запятую. У тебя 30 секунд'
+          'Напиши сообщение, которое бот будет использовать в качестве темы для шутки. Можно несколько тем через запятую. У тебя 3 минуты'
         );
 
         const timeOutId = setTimeout(() => {
@@ -50,7 +50,7 @@ export const getUsersTopic = async (
             `${sender}, время на ввод темы истекло, отправляю дефолтный опрос`
           );
           resolve(null);
-        }, 60000);
+        }, 180000);
 
         const onMessage = (msg: TelegramBot.Message) => {
           if (msg.chat.id !== chatId) return;

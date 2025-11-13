@@ -2,7 +2,6 @@ import TelegramBot from 'node-telegram-bot-api';
 import { getChatId } from '../../../shared/utils/utils';
 import { Summary } from './model';
 import { PollBot } from '../../bot';
-import { getMoscowDate } from '../../../shared/utils/date';
 import {
   defaultAppeal,
   floodChatId,
@@ -191,7 +190,7 @@ export class SummaryService implements Summary {
     const summaryCollection = db.collection('summary');
 
     const messageRecord = {
-      date: getMoscowDate(),
+      date: new Date(),
       text,
       user: encryptedUserName,
       chatId,

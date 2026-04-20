@@ -5,13 +5,22 @@ import { activateMessageReactions } from '../../features/messageReactions';
 import { startGamePollListener } from '../../features/poll/games';
 import { startPracticePollListener } from '../../features/poll/practice';
 import { PollBot } from '../bot';
+import { BotConfig } from '../model';
 
 export class BotListeners {
   listeners: Array<(bot: PollBot) => void>;
 
-  constructor() {
+  constructor(config: BotConfig) {
     this.listeners = [];
-    this.addAllListeners();
+
+    if (config.isSeasonOngoing) {
+      this.addPracticePollListener();
+      this.addGamePollListener();
+    }
+
+    this.addHealthCheckListener();
+    this.addDropDbListener();
+    this.addChatIdListener();
   }
 
   addPracticePollListener() {
@@ -41,7 +50,7 @@ export class BotListeners {
   addAllListeners() {
     this.addPracticePollListener();
     this.addGamePollListener();
-    // this.addMessageReactionsListener(); отключил реакции на двач
+    this.addMessageReactionsListener();
     this.addHealthCheckListener();
     this.addDropDbListener();
     this.addChatIdListener();

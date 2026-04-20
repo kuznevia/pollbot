@@ -3,7 +3,7 @@ import { DB } from './db/DB';
 import { commands } from './commands';
 import { BotListeners } from './plugins/listeners';
 import { BotScheduler } from './plugins/scheduledActions';
-import { BotState, PollBotMessageOptions } from './model';
+import { BotConfig, BotState, PollBotMessageOptions } from './model';
 import { defaultAppeal, currentLLMModel } from '../shared/consts/consts';
 import { getChatId, getSender } from '../shared/utils/utils';
 import { LLMFactory } from './AI/factory';
@@ -18,12 +18,16 @@ export class PollBot extends TelegramBot {
   state = BotState.IDLE;
   services: BotServices;
 
-  constructor(token: string, options?: TelegramBot.ConstructorOptions) {
+  constructor(
+    token: string,
+    config: BotConfig,
+    options?: TelegramBot.ConstructorOptions
+  ) {
     super(token, options);
     this.db = new DB();
     this.AI = new LLMFactory(currentLLMModel as LLMModelType).getProvider();
-    this.listener = new BotListeners();
-    this.scheduler = new BotScheduler();
+    this.listener = new BotListeners(config);
+    this.scheduler = new BotScheduler(config);
     this.services = new BotServices(this);
   }
 

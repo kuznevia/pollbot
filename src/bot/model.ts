@@ -8,3 +8,7 @@ export enum BotState {
 export interface PollBotMessageOptions extends TelegramBot.SendMessageOptions {
   isBotSender?: Boolean;
 }
+
+export type BotConfig = {
+  isSeasonOngoing: boolean;
+};

@@ -32,6 +32,14 @@ class EnvConfig {
     }
     return value;
   }
+
+  public getBoolean(key: string): boolean {
+    const value = this.envVariables[key];
+    if (value === undefined) {
+      throw new Error(`Environment variable ${key} is not set`);
+    }
+    return value === 'true' ? true : false;
+  }
 }
 
 export const envConfig = EnvConfig.getInstance();

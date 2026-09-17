@@ -33,6 +33,22 @@ export function isMondayOrThursday() {
   return dayOfWeek === 1 || dayOfWeek === 4; // Возвращаем true, если понедельник или четверг
 }
 
+// Функция для проверки, является ли сегодня понедельником
+export function isMonday() {
+  const today = new Date();
+
+  const dayOfWeek = today.getDay(); // Получаем день недели (0 - воскресенье, 1 - понедельник, ..., 6 - суббота)
+  return dayOfWeek === 1; // Возвращаем true, если понедельник
+}
+
+// Функция для проверки, является ли сегодня вторник или четвергом
+export function isTuesdayOrThursday() {
+  const today = new Date();
+
+  const dayOfWeek = today.getDay(); // Получаем день недели (0 - воскресенье, 1 - понедельник, ..., 6 - суббота)
+  return dayOfWeek === 2 || dayOfWeek === 4; // Возвращаем true, если вторник или четверг
+}
+
 // Функция для сохранения даты последнего опроса в файл
 export async function saveLastPollToDB(
   collection: Collection,

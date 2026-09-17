@@ -1,8 +1,9 @@
 import TelegramBot from 'node-telegram-bot-api';
 import { ROUTES } from '../../../shared/routes/routes';
 import {
-  isMondayOrThursday,
+  isMonday,
   isPollCreatedToday,
+  isTuesdayOrThursday,
   saveLastPollToDB,
 } from '../../../shared/utils/date';
 import { Poll } from '../model';
@@ -15,7 +16,7 @@ import {
   outranMessage,
 } from '../../../shared/consts/consts';
 import { isBot } from '../../../shared/utils/utils';
-import { defaultPollMessage, defaultPollOptions } from './const';
+import { getDefaultPollMessage, defaultPollOptions } from './const';
 import { getAIPollData, getUsersTopic } from '../AI';
 
 // Регулярный опрос на тренировку
@@ -25,7 +26,7 @@ const createPoll = async (
   sender: string
 ) => {
   if (isBot(sender)) {
-    return bot.sendPoll(chatId, defaultPollMessage, defaultPollOptions, {
+    return bot.sendPoll(chatId, getDefaultPollMessage(), defaultPollOptions, {
       is_anonymous: false,
     });
   }
@@ -39,7 +40,7 @@ const createPoll = async (
     sender,
     pollMessage
   );
-  const pollQuestion = AIPollQuestion || defaultPollMessage;
+  const pollQuestion = AIPollQuestion || getDefaultPollMessage();
   const options = AIoptions || defaultPollOptions;
 
   return bot.sendPoll(chatId, pollQuestion, options, {
@@ -56,11 +57,11 @@ export const sendPracticePoll = async (
   const gifPath = ROUTES.HELLO_JPG;
 
   try {
-    // Проверяем, является ли сегодня понедельником или четвергом
-    if (!isMondayOrThursday()) {
+    // Проверяем, является ли сегодня понедельником, вторником или четвергом
+    if (!isMonday() && !isTuesdayOrThursday) {
       bot.sendMessage(
         chatId,
-        `${sender}, опросы можно создавать только по понедельникам и четвергам, ${defaultAppeal}`
+        `${sender}, опросы можно создавать только по понедельникам, вторникам и четвергам, ${defaultAppeal}`
       );
 
       return;

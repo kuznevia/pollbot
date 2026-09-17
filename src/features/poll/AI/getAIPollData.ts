@@ -3,7 +3,7 @@ import TelegramBot from 'node-telegram-bot-api';
 import { PollBot } from '../../../bot';
 import { geminiModel } from '../../../shared/consts/consts';
 import { isBot } from '../../../shared/utils/utils';
-import { defaultPollMessage, defaultPollOptions } from '../practice/const';
+import { getDefaultPollMessage, defaultPollOptions } from '../practice/const';
 
 //Запрос оригинальных текстовок опросов через GigaChat
 export const getAIPollData = async (
@@ -23,7 +23,7 @@ export const getAIPollData = async (
 
     if (jsonMatch) {
       const parsedJson = JSON.parse(jsonMatch[1]);
-      const AIPollQuestion = parsedJson?.question || defaultPollMessage;
+      const AIPollQuestion = parsedJson?.question || getDefaultPollMessage();
 
       const AIoptions =
         parsedJson?.yes && parsedJson?.no && parsedJson?.dunno

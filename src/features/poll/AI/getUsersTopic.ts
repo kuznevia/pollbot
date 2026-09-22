@@ -1,6 +1,6 @@
 import TelegramBot from 'node-telegram-bot-api';
 import { PollBot } from '../../../bot';
-import { lazyMember } from '../../../shared/consts/consts';
+import { isAIPollsOn, lazyMember } from '../../../shared/consts/consts';
 
 export const getUsersTopic = async (
   bot: PollBot,
@@ -8,6 +8,13 @@ export const getUsersTopic = async (
   sender: string
 ) => {
   return new Promise<string | null>((resolve) => {
+    if (!isAIPollsOn) {
+      resolve(null);
+      return;
+    }
+
+    console.log({ isAIPollsOn });
+
     bot.sendMessage(chatId, `${sender}, хочешь задать тему сам?`, {
       reply_markup: {
         inline_keyboard: [

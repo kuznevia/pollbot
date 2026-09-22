@@ -12,8 +12,6 @@ import { PollBot } from '../../../bot';
 import {
   defaultAppeal,
   gigaChatPollMessage,
-  letsGoMessage,
-  outranMessage,
 } from '../../../shared/consts/consts';
 import { isBot } from '../../../shared/utils/utils';
 import { getDefaultPollMessage, defaultPollOptions } from './const';
@@ -87,10 +85,6 @@ export const sendPracticePoll = async (
     await bot.sendAnimation(chatId, gifPath);
     const pollMessage = await createPoll(bot, chatId, sender);
     await bot.pinChatMessage(chatId, pollMessage.message_id);
-    await bot.sendMessage(
-      chatId,
-      isBot(sender) ? outranMessage : letsGoMessage
-    );
 
     // Сохраняем дату последнего опроса
     await saveLastPollToDB(pollsCollection, Poll.practice);

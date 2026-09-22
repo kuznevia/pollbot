@@ -44,22 +44,24 @@ const createPoll = (
   game: Game,
   isLastPoll: boolean
 ) => {
-  return createGamePoll(bot, Number(chatId), game)
-    .then((pollMessage) => {
-      //Добавляем сообщение закреп
-      const messageId = pollMessage.message_id;
-      return bot.pinChatMessage(chatId, messageId);
-    })
-    .then(() => {
-      if (isLastPoll) {
-        return bot.sendMessage(chatId, gamePollMessage);
-      }
-    })
-    .catch((err) => {
-      console.error('Ошибка: ', err);
-      const errorMessage = err?.response?.body?.description;
-      bot.sendMessage(chatId, `Ошибка, братья, \n${errorMessage}`);
-    });
+  return (
+    createGamePoll(bot, Number(chatId), game)
+      .then((pollMessage) => {
+        //Добавляем сообщение закреп
+        const messageId = pollMessage.message_id;
+        return bot.pinChatMessage(chatId, messageId);
+      })
+      // .then(() => {
+      //   if (isLastPoll) {
+      //     return bot.sendMessage(chatId, gamePollMessage);
+      //   }
+      // })
+      .catch((err) => {
+        console.error('Ошибка: ', err);
+        const errorMessage = err?.response?.body?.description;
+        bot.sendMessage(chatId, `Ошибка, братья, \n${errorMessage}`);
+      })
+  );
 };
 
 export const sendGamePoll = async (

@@ -8,13 +8,8 @@ import {
 import { findNextGames } from './utils/findNextGame';
 import { PollBotError } from '../../../shared/model/model';
 import { PollBot } from '../../../bot';
-import {
-  defaultAppeal,
-  gamePollMessage,
-  gamePollReady,
-} from '../../../shared/consts/consts';
+import { defaultAppeal, gamePollReady } from '../../../shared/consts/consts';
 import { isAdminOrBot, isBot } from '../../../shared/utils/utils';
-import { ROUTES } from '../../../shared/routes/routes';
 
 // Регулярный опрос на игру
 const createGamePoll = (
@@ -38,12 +33,7 @@ const createGamePoll = (
   });
 };
 
-const createPoll = (
-  bot: PollBot,
-  chatId: number,
-  game: Game,
-  isLastPoll: boolean
-) => {
+const createPoll = (bot: PollBot, chatId: number, game: Game) => {
   return (
     createGamePoll(bot, Number(chatId), game)
       .then((pollMessage) => {
@@ -108,13 +98,8 @@ export const sendGamePoll = async (
       return;
     }
 
-    // Путь к локальному GIF файлу
-    const gifPath = ROUTES.HELLO_JPG;
-    await bot.sendAnimation(chatId, gifPath);
-
     for (const game of nextGames) {
-      const isLastPoll = nextGames.indexOf(game) === nextGames.length - 1;
-      await createPoll(bot, Number(chatId), game, isLastPoll);
+      await createPoll(bot, Number(chatId), game);
       await saveLastPollToDB(pollsCollection, Poll.game, game.GameID);
     }
   } catch (err) {

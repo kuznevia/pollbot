@@ -7,6 +7,7 @@ export interface Game {
   LeagueNameRu: string;
   GameDateTime: string;
   GameID: number;
+  IsToday: boolean;
 }
 
 export type GamesResponse = Game[];

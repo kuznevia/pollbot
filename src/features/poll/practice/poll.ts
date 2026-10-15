@@ -1,5 +1,5 @@
 import TelegramBot from 'node-telegram-bot-api';
-import { ROUTES } from '../../../shared/routes/routes';
+
 import {
   isMonday,
   isPollCreatedToday,
@@ -16,6 +16,7 @@ import {
 import { isBot } from '../../../shared/utils/utils';
 import { getDefaultPollMessage, defaultPollOptions } from './const';
 import { getAIPollData, getUsersTopic } from '../AI';
+import { shouldSkipTraining } from './utils/shouldSkipTraining';
 
 // Регулярный опрос на тренировку
 const createPoll = async (
@@ -51,18 +52,25 @@ export const sendPracticePoll = async (
   chatId: number,
   sender: string
 ) => {
-  // Путь к локальному GIF файлу
-  const gifPath = ROUTES.HELLO_JPG;
-
   try {
     // Проверяем, является ли сегодня понедельником, вторником или четвергом
-    if (!isMonday() && !isTuesdayOrThursday) {
+    if (!isMonday() && !isTuesdayOrThursday()) {
       bot.sendMessage(
         chatId,
         `${sender}, опросы можно создавать только по понедельникам, вторникам и четвергам, ${defaultAppeal}`
       );
 
       return;
+    }
+
+    if (await shouldSkipTraining()) {
+      await bot.sendMessageOrConsole(
+        chatId,
+        `${sender}, сегодня игра, ${defaultAppeal}`,
+        {
+          isBotSender: isBot(sender),
+        }
+      );
     }
 
     // Проверка, был ли уже создан опрос сегодня
@@ -82,7 +90,6 @@ export const sendPracticePoll = async (
       return;
     }
 
-    await bot.sendAnimation(chatId, gifPath);
     const pollMessage = await createPoll(bot, chatId, sender);
     await bot.pinChatMessage(chatId, pollMessage.message_id);
 
